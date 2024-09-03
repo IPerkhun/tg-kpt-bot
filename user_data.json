@@ -1,0 +1,79 @@
+{
+    "67306629": {
+        "relapse_sessions": [
+            {
+                "current_step": "relapse_situation",
+                "date_time": "03.09.2024 11:41",
+                "situation": null,
+                "thoughts": null,
+                "emotion_type": null,
+                "emotion_score": null,
+                "physical": null,
+                "behavior": null
+            },
+            {
+                "current_step": null,
+                "date_time": "03.09.2024 11:59",
+                "situation": "На работе",
+                "thoughts": "sasd",
+                "emotion_type": "Возбуждение",
+                "emotion_score": 4,
+                "physical": "sasd",
+                "behavior": "asdasd"
+            },
+            {
+                "current_step": null,
+                "date_time": "03.09.2024 12:01",
+                "situation": "На вечеринке",
+                "thoughts": "Курение поможет мне успокоиться",
+                "emotion_type": "Тревога",
+                "emotion_score": 4,
+                "physical": "Дрожь в руках",
+                "behavior": "Сделать физическую нагрузку"
+            },
+            {
+                "current_step": null,
+                "date_time": "03.09.2024 12:12",
+                "situation": "Дома",
+                "thoughts": "Я не выдержу без сигареты",
+                "emotion_type": "Тревога",
+                "emotion_score": 4,
+                "physical": "Боль в груди",
+                "behavior": "Сделать физическую нагрузку"
+            }
+        ],
+        "current_step": null,
+        "курение": "Кальян",
+        "интенсивность": "2-3 раза в неделю",
+        "стаж": "5-10 лет",
+        "причина": "dfe",
+        "smoking_type": "Сигареты",
+        "intensity": "До 5 штук в день 😌",
+        "period": "1-3 года",
+        "reason": "sadsda"
+    },
+    "61350155": {
+        "relapse_sessions": [
+            {
+                "current_step": null,
+                "date_time": "03.09.2024 12:04",
+                "situation": "В ЭСКОПИСТЕ",
+                "thoughts": "Пипи унд каки Ин пипикакалэнд",
+                "emotion_type": "Возбуждение",
+                "emotion_score": 3,
+                "physical": "….",
+                "behavior": "Сделать физическую нагрузку"
+            }
+        ],
+        "current_step": "step2",
+        "smoking_type": "Айкос",
+        "intensity": "Целая пачка и больше в день 🚬",
+        "period": "Более 10 лет",
+        "reason": "Аааааа"
+    },
+    "7156575067": {
+        "relapse_sessions": [],
+        "current_step": "step2",
+        "smoking_type": "Саси хуй"
+    }
+}
