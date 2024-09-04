@@ -4,12 +4,12 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
 from dotenv import load_dotenv
 import os
-from start_quiz import (
+from modules.start_quiz import (
     start_quiz, handle_quiz_step1, 
     handle_quiz_step2, handle_quiz_step3,
     handle_quiz_step4, handle_custom_reason
 )
-from relapse_quiz import (
+from modules.relapse_quiz import (
     start_relapse_quiz, 
     handle_relapse_situation, 
     handle_relapse_thoughts, handle_relapse_custom_message, 
@@ -17,9 +17,9 @@ from relapse_quiz import (
     handle_relapse_physical, 
     handle_relapse_behavior
 )
-from data_manager import get_user_data, get_last_relapse_session
+from db.data_manager import get_user_data, get_last_relapse_session
 from aiogram.types import BotCommand
-from content import help_text
+from utils.content import help_text
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 

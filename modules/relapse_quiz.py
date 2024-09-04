@@ -1,10 +1,12 @@
 from aiogram import types
+import asyncio
 from aiogram.types import ContentType, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from data_manager import get_user_data, update_user_data
+from db.data_manager import get_user_data, update_user_data
 from datetime import datetime
-from data_models import RelapseSession
+from utils.data_models import RelapseSession
+from modules.note_manager import GPTTherapist
 from dataclasses import asdict
-from content import (
+from utils.content import (
     RELAPSE_QUIZ_START_MESSAGE, RELAPSE_QUIZ_SITUATION_PROMPT, 
     RELAPSE_QUIZ_CUSTOM_SITUATION_PROMPT, RELAPSE_QUIZ_THOUGHTS_PROMPT, 
     RELAPSE_QUIZ_CUSTOM_THOUGHTS_PROMPT, RELAPSE_QUIZ_EMOTIONS_PROMPT, 
@@ -72,7 +74,7 @@ async def ask_thoughts(message: types.Message):
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Я не выдержу без сигареты")],
-            [KeyboardButton(text="Курение поможет мне успокоиться")],
+            [KeyboardButton(text="Я просто хочу сдаться так как не вижу в этом смысла")],
             [KeyboardButton(text="Сигарета поможет мне сконцентрироваться")],
             [KeyboardButton(text="Свой вариант")]
         ],
@@ -146,9 +148,9 @@ async def handle_relapse_emotion_score(message: types.Message):
 async def ask_physical(message: types.Message):
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="Сильное сердцебиение")],
-            [KeyboardButton(text="Дрожь в руках")],
-            [KeyboardButton(text="Боль в груди")],
+            [KeyboardButton(text="Мания")],
+            [KeyboardButton(text="Трясущиеся руки")],
+            [KeyboardButton(text="Все окей ")],
             [KeyboardButton(text="Другое")]
         ],
         resize_keyboard=True
@@ -184,7 +186,7 @@ async def ask_behavior(message: types.Message):
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Попить чай")],
-            [KeyboardButton(text="Сделать физическую нагрузку")],
+            [KeyboardButton(text="Подышать свежим воздухом")],
             [KeyboardButton(text="Набрать по телефону близкому человеку")],
             [KeyboardButton(text="Другое")]
         ],
@@ -213,8 +215,39 @@ async def finish_relapse_quiz(message: types.Message):
     current_session = user_data['relapse_sessions'][-1]
     current_session['current_step'] = None
     update_user_data(user_id, user_data)
+    
+    # Получение рекомендаций от GPT-терапевта
+    response = GPTTherapist().get_help(user_data['relapse_sessions'][:-1])
 
-    await message.answer(RELAPSE_QUIZ_FINISH_MESSAGE, reply_markup=ReplyKeyboardRemove())
+    # Сообщение о завершении опроса
+    await message.answer(
+        "*Отличная работа!*\n\n"
+        "Ты завершил очередной шаг на пути к здоровой жизни. Ниже твоя короткая заметка. "
+        "Сейчас пришлю несколько советов, которые помогут тебе двигаться дальше.",
+        reply_markup=ReplyKeyboardRemove(),
+        parse_mode='Markdown'
+    )
+
+    # Формирование текста с заполненными данными
+    text = (
+        f"📝 *Твои ответы:*\n\n"
+        f"*Ситуация:* {current_session['situation']}\n"
+        f"*Мысли:* {current_session['thoughts']}\n"
+        f"*Эмоции:* {current_session['emotion_type']} (Оценка: {current_session['emotion_score']})\n"
+        f"*Физическое состояние:* {current_session['physical']}\n"
+        f"*Поведение:* {current_session['behavior']}\n"
+    )
+    
+    # Отправка заполненных данных
+    await message.answer(text, parse_mode='Markdown')
+
+    # Пауза на 5 секунд перед отправкой рекомендаций
+    await asyncio.sleep(10)
+
+    # Отправка рекомендаций от GPT-терапевта
+    await message.answer(response, parse_mode='Markdown')
+
+    
 
 async def handle_relapse_custom_message(message: types.Message):
     user_id = message.from_user.id

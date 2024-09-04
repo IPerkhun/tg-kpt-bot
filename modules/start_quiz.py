@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from data_manager import get_user_data, update_user_data, clear_user_data
-from content import (
+from db.data_manager import get_user_data, update_user_data, clear_user_data
+from utils.content import (
     WELCOME_MESSAGE, STEP1_CIGARETTES_MESSAGE, STEP1_ELECTRONIC_MESSAGE, 
     STEP1_HOOKAH_MESSAGE, STEP1_IQOS_MESSAGE, STEP2_MESSAGE, 
     STEP3_MESSAGE, CUSTOM_REASON_PROMPT, FINISH_QUIZ_MESSAGE
@@ -140,4 +140,4 @@ async def finish_quiz(message: types.Message):
     user_data['current_step'] = None
     update_user_data(user_id, user_data)
 
-    await message.answer(FINISH_QUIZ_MESSAGE, reply_markup=ReplyKeyboardRemove())
+    await message.answer(FINISH_QUIZ_MESSAGE, reply_markup=ReplyKeyboardRemove(), parse_mode='Markdown')
