@@ -6,4 +6,4 @@ __pycache__
 *.db
 *.sqlite3
 *.log
-user_data.json
+# user_data.json
