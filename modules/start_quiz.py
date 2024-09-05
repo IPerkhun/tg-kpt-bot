@@ -105,10 +105,10 @@ async def handle_quiz_step3(message: types.Message):
 
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="Здоровье")],
-            [KeyboardButton(text="Финансы")],
-            [KeyboardButton(text="Социальное окружение")],
-            [KeyboardButton(text="Свой вариант")]
+            [KeyboardButton(text="Хочу выглядеть моложе и свежее 🌟")],
+            [KeyboardButton(text="Надоело кашлять и задыхаться 🤒")],
+            [KeyboardButton(text="Не хочу чтобы от меня воняло 🚫👃")],
+            [KeyboardButton(text="Свой вариант ✍️")]
         ],
         resize_keyboard=True
     )
@@ -135,7 +135,6 @@ async def handle_custom_reason(message: types.Message):
 
 async def finish_quiz(message: types.Message):
     user_id = message.from_user.id
-    # clear_user_data(user_id)  # Очищаем данные после завершения квиза
     user_data = get_user_data(user_id)
     user_data['current_step'] = None
     update_user_data(user_id, user_data)

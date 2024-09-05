@@ -3,3 +3,4 @@ matplotlib
 aiogram
 python-dotenv
 openai
+apscheduler

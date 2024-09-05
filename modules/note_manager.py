@@ -53,23 +53,6 @@ class GPTTherapist:
         return completion.choices[0].message.content
     
 
-user_data = [
-    {
-        "current_step": None,
-        "date_time": "03.09.2024 12:01",
-        "situation": "Ехал в такси и ветер  дул лицо захотелось закурить",
-        "thoughts": "Курение поможет мне успокоиться",
-        "emotion_type": "Тревога",
-        "emotion_score": 4,
-        "physical": "Дрожь в руках",
-        "behavior": "Сделать физическую нагрузку"
-    }]
-
-cbt_therapist = GPTTherapist()
-# start_date = "01.09.2024"
-# current_date = "03.09.2024"
-
-print(cbt_therapist.get_help( user_data))
 
 
 

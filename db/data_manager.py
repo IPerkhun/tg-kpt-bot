@@ -21,7 +21,8 @@ def get_last_relapse_session(user_id):
     user_data = get_user_data(user_id)
     if user_data["relapse_sessions"]:
         return user_data["relapse_sessions"][-1]
-    return None
+    user_data["relapse_sessions"].append({})
+    return user_data["relapse_sessions"][-1]
 
 def update_user_data(user_id, user_data):
     data = load_data()
@@ -33,3 +34,7 @@ def clear_user_data(user_id):
     if str(user_id) in data:
         del data[str(user_id)]
     save_data(data)
+
+def get_stop_smoking_time(user_id):
+    user_data = get_user_data(user_id)
+    return user_data.get('stop_smoking_time')

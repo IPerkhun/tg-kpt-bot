@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: kpt_bot
+    restart: always
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    command: python app.py

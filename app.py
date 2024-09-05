@@ -1,3 +1,5 @@
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
@@ -17,6 +19,8 @@ from modules.relapse_quiz import (
     handle_relapse_physical, 
     handle_relapse_behavior
 )
+
+from modules.stop_smoking import cmd_stop_smoking 
 from db.data_manager import get_user_data, get_last_relapse_session
 from aiogram.types import BotCommand
 from utils.content import help_text
@@ -33,8 +37,9 @@ async def set_bot_commands(bot: Bot):
     commands = [
         BotCommand(command="/start", description="Начать квиз"),
         BotCommand(command="/stop_smoking", description="Бросить курить"),
+        BotCommand(command="/relapse_warning", description="Я сейчас сорвусь"),
         BotCommand(command="/help", description="Помощь"),
-        BotCommand(command="/notes", description="Мои заметки")  # Новая команда
+        BotCommand(command="/notes", description="Мои заметки") 
 
     ]
     await bot.set_my_commands(commands)
@@ -46,7 +51,7 @@ async def cmd_start(message: types.Message):
 
 @dp.message(Command("help"))
 async def cmd_help(message: types.Message):
-    await message.answer(help_text, reply_markup=types.ReplyKeyboardRemove(), parse_mode="Markdown")
+    await message.answer(help_text, reply_markup=types.ReplyKeyboardRemove(), parse_mode="MArkdown")
 
 @dp.message(Command("notes"))
 async def cmd_notes(message: types.Message):
@@ -92,8 +97,8 @@ async def handle_quiz_custom_reason(message: types.Message):
     await handle_custom_reason(message)
     
 # Обработчики для опроса при желании сорваться
-@dp.message(Command("stop_smoking"))
-async def cmd_stop_smoking(message: types.Message):
+@dp.message(Command("relapse_warning"))
+async def cmd_relapse_warning(message: types.Message):
     await start_relapse_quiz(message)
 
 @dp.message(lambda message: get_last_relapse_session(message.from_user.id).get('current_step') == 'relapse_situation')
@@ -124,7 +129,15 @@ async def handle_relapse_5(message: types.Message):
 async def handle_relapse_6(message: types.Message):
     await handle_relapse_behavior(message)
 
+# Обработчик для команды /stop_smoking
+@dp.message(Command("stop_smoking"))
+async def stop_smoking_handler(message: types.Message):
+    await cmd_stop_smoking(message, bot)
+    
 async def main():
+    # Планировщик
+    scheduler = AsyncIOScheduler()
+    scheduler.start()
     await set_bot_commands(bot)
     await dp.start_polling(bot)
 
