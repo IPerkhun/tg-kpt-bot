@@ -7,6 +7,7 @@ services:
     restart: always
     volumes:
       - .:/app
-    env_file:
-      - .env
+    environment:
+      - TG_API_TOKEN=${TG_API_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     command: python app.py
