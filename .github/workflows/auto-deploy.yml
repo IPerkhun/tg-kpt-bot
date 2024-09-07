@@ -10,13 +10,12 @@ env:
   IMAGE_TYPE: kpt-server
 
 jobs:
-
   Build-client-image:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Build, tag, and push image to Yandex Cloud Container Registry
       run: |
         docker build -t $IMAGE_TYPE:$IMAGE_TAG .
