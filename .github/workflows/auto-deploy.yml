@@ -1,0 +1,43 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  IMAGE_TAG: ${{ github.sha }}
+  IMAGE_TYPE: kpt-server
+
+jobs:
+
+  Build-client-image:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build, tag, and push image to Yandex Cloud Container Registry
+      run: |
+        docker build -t $IMAGE_TYPE:$IMAGE_TAG .
+        docker save -o $IMAGE_TYPE.$IMAGE_TAG.tar $IMAGE_TYPE:$IMAGE_TAG
+
+    - name: Copy file to server
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
+        scp $IMAGE_TYPE.$IMAGE_TAG.tar $SERVER_USER@$SERVER_IP:/opt/deploy/
+
+    - name: Deploy to KPT instance
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: /opt/deploy/server.sh $IMAGE_TYPE.$IMAGE_TAG
