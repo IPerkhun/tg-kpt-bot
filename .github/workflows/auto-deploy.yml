@@ -20,6 +20,7 @@ jobs:
       run: |
         docker build -t $IMAGE_TYPE:$IMAGE_TAG .
         docker save -o $IMAGE_TYPE.$IMAGE_TAG.tar $IMAGE_TYPE:$IMAGE_TAG
+        pwd && ls -al
 
     - name: Copy file to server using appleboy
       uses: appleboy/scp-action@master
