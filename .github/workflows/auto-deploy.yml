@@ -28,8 +28,8 @@ jobs:
         host: ${{ secrets.SERVER_IP }}
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "$IMAGE_TYPE.$IMAGE_TAG.tar"
-        target: "/opt/deploy"
+        source: $IMAGE_TYPE.$IMAGE_TAG.tar
+        target: /opt/deploy
 
     - name: Deploy to KPT instance
       uses: appleboy/ssh-action@master
