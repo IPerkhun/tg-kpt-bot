@@ -6,11 +6,13 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
 from dotenv import load_dotenv
 import os
+
 from modules.start_quiz import (
     start_quiz, handle_quiz_step1, 
     handle_quiz_step2, handle_quiz_step3,
     handle_quiz_step4, handle_custom_reason
 )
+
 from modules.relapse_quiz import (
     start_relapse_quiz, 
     handle_relapse_situation, 
@@ -64,16 +66,16 @@ async def cmd_notes(message: types.Message):
 
     notes_text = ""
     for idx, session in enumerate(sessions, 1):
-        notes_text += f"Заметка {idx}:\n"
-        notes_text += f"Дата: {session.get('date_time', 'Не указана')}\n"
-        notes_text += f"Ситуация: {session.get('situation', 'Не указана')}\n"
-        notes_text += f"Мысли: {session.get('thoughts', 'Не указаны')}\n"
-        notes_text += f"Эмоции: {session.get('emotion_type', 'Не указаны')} (Оценка: {session.get('emotion_score', 'Не указана')})\n"
-        notes_text += f"Физическое состояние: {session.get('physical', 'Не указано')}\n"
-        notes_text += f"Поведение: {session.get('behavior', 'Не указано')}\n"
-        notes_text += "-"*20 + "\n"
+        notes_text += f"📄 *Заметка {idx}*\n"
+        notes_text += f"🗓 *Дата*: {session.get('date_time', 'Не указана')}\n"
+        notes_text += f"📍 *Ситуация*: {session.get('situation', 'Не указана')}\n"
+        notes_text += f"💭 *Мысли*: {session.get('thoughts', 'Не указаны')}\n"
+        notes_text += f"😶‍🌫️ *Эмоции*: {session.get('emotion_type', 'Не указаны')} (Оценка: {session.get('emotion_score', 'Не указана')})\n"
+        notes_text += f"💪 *Физическое состояние*: {session.get('physical', 'Не указано')}\n"
+        notes_text += f"🎯 *Поведение*: {session.get('behavior', 'Не указано')}\n"
+        notes_text += f"{'-'*30}\n\n"
     
-    await message.answer(notes_text, reply_markup=types.ReplyKeyboardRemove())
+    await message.answer(notes_text, reply_markup=types.ReplyKeyboardRemove(), parse_mode="Markdown")
 
 # Обработчики для этапов квиза
 @dp.message(lambda message: get_user_data(message.from_user.id).get('current_step') == 'step1')
