@@ -1,8 +1,9 @@
-#%%
+# %%
 import openai
 import os
 from dotenv import load_dotenv
 from typing import List, Dict
+
 load_dotenv()
 
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -29,31 +30,32 @@ PROMPT_INSTRUCTIONS = """
 Примеры ответов:
 Ты на верном пути! В моменты тревоги попробуй заменить курение на глубокое дыхание или короткую прогулку. Это поможет снизить напряжение. Также может помочь записать свои мысли и чувства. Ты справляешься с этим! Я в тебя верю!
 """
+
+
 class GPTTherapist:
     def __init__(self, api_key: str = API_KEY):
         self.prompt = PROMPT_INSTRUCTIONS
         openai.api_key = api_key
         self.client = openai.OpenAI()
-    
-    def _build_user_input(self, start_date: str, current_date: str, data: List[Dict]) -> str:
+
+    def _build_user_input(
+        self, start_date: str, current_date: str, data: List[Dict]
+    ) -> str:
         user_input = f"{data} не курю с {start_date} время сейчас {current_date}"
         return user_input
 
-    def get_help(self, data: List[Dict], start_date = None, current_date = None) -> str:
+    def get_help(self, data: List[Dict], start_date=None, current_date=None) -> str:
         user_input = self._build_user_input(start_date, current_date, data)
         completion = self.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": self.prompt},
-                {"role": "user", "content": user_input}
+                {"role": "user", "content": user_input},
             ],
             max_tokens=200,
-            temperature=1.0
+            temperature=1.0,
         )
         return completion.choices[0].message.content
-    
-
-
 
 
 # %%

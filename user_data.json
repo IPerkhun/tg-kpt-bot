@@ -3,79 +3,93 @@
         "relapse_sessions": [
             {
                 "current_step": null,
-                "date_time": "05.09.2024 17:10",
-                "situation": "Дома",
+                "date_time": "10.09.2024 01:27",
+                "situation": "На работе",
                 "thoughts": "Я просто хочу сдаться так как не вижу в этом смысла",
-                "emotion_type": "Тревога",
-                "emotion_score": 2,
-                "physical": "Трясущиеся руки",
-                "behavior": "Подышать свежим воздухом"
+                "emotion_type": "Злость",
+                "emotion_score": 4,
+                "physical": "fknkt",
+                "behavior": "knrvkrn"
+            }
+        ],
+        "voices": [
+            {
+                "current_step": "waiting_for_voice",
+                "file_id": "AwACAgIAAxkBAAIJ3mbfZ0gM0qWNtIsocHiPsdwwYqI1AAKDWAAC_Kj4Stc95MC1H-v4NgQ",
+                "text": "Тестовое голосовое сообщение.",
+                "confirmed": false
             },
             {
-                "current_step": null,
-                "date_time": "05.09.2024 17:25",
-                "situation": "Дома",
-                "thoughts": "Я не выдержу без сигареты",
-                "emotion_type": "Тревога",
-                "emotion_score": 5,
-                "physical": "Меня бесит все",
-                "behavior": "Подышать свежим воздухом"
+                "current_step": "waiting_for_confirmation",
+                "file_id": "AwACAgIAAxkBAAIJ3mbfZ0gM0qWNtIsocHiPsdwwYqI1AAKDWAAC_Kj4Stc95MC1H-v4NgQ",
+                "text": "Тестовое голосовое сообщение.",
+                "confirmed": true
+            },
+            {
+                "current_step": "waiting_for_voice",
+                "file_id": null,
+                "text": null,
+                "confirmed": false
+            },
+            {
+                "current_step": "waiting_for_voice",
+                "file_id": "AwACAgIAAxkBAAIJ3mbfZ0gM0qWNtIsocHiPsdwwYqI1AAKDWAAC_Kj4Stc95MC1H-v4NgQ",
+                "text": "Тестовое голосовое сообщение.",
+                "confirmed": false
+            },
+            {
+                "current_step": "waiting_for_voice",
+                "file_id": null,
+                "text": null,
+                "confirmed": false
             }
         ],
-        "current_step": null,
-        "smoking_type": "/relapse_warning",
-        "intensity": "/relapse_warning",
-        "period": "Более 10 лет",
-        "stop_smoking_time": "2024-09-09 10:37:17",
-        "job_ids": [
-            "fcc1c3d3e9ff4f75bc6a7dfebf898906",
-            "d99cc53a34394fccada7c27060ce3f93",
-            "902bf2209a6449379f9113fa5f289377",
-            "a98bd04776154aa2aeade0f08b621649",
-            "5501f336fbcf4747849091efec097bd6",
-            "73fc45bcc3f54a86b85eb74b3b2f121e",
-            "7b32070818074a3d9251d4ff655f5150",
-            "d3804d7ba05e4b7a851ba1e2cacdf439",
-            "21519ea506464cdeba3d26b1219dbd38",
-            "8632d1e49b20485b96423c9bc0123424",
-            "198ebab92e9149a186849b02a0bb21d1",
-            "c04d5fdc2d1e42c792e3f38529b55f3c"
+        "start_quizes": [
+            {
+                "current_step": "finished",
+                "smoking_type": "Айкос",
+                "intensity": "1 пачка и более в день",
+                "period": "Более 10 лет",
+                "reason": "Свой вариант ✍️"
+            },
+            {
+                "current_step": "finished",
+                "smoking_type": "Айкос",
+                "intensity": "1 пачка и более в день",
+                "period": "Более 10 лет",
+                "reason": "Свой вариант ✍️"
+            },
+            {
+                "current_step": "finished",
+                "smoking_type": "Айкос",
+                "intensity": "1 пачка и более в день",
+                "period": "Более 10 лет",
+                "reason": "Свой вариант ✍️"
+            },
+            {
+                "current_step": "finished",
+                "smoking_type": "Айкос",
+                "intensity": "1 пачка и более в день",
+                "period": "Более 10 лет",
+                "reason": "ghbdtn"
+            }
         ],
         "stop_smoking_data": {
-            "time": "2024-09-09 10:43:35",
+            "time": "2024-09-10 01:31:32",
             "jobs": [
-                "c1f4fc9f2dad422f8e251f73b7ea52b9",
-                "b619fa9560fb4ec09d3bf4a5ca804353",
-                "e831c6ec1d214171ac6caf7b4358b09b",
-                "b5d1f5bba34b442b8341c5baef17a9e8",
-                "cfd554ba94ad4f1086ab816fc9086009",
-                "4be53764927d4a4288800088452da770",
-                "ff7b08f6f4ec40c7af5766139fdf80c4",
-                "b21db6bb2e0b4f599ee4b6b322bf5357",
-                "19a7ce59a4e945a1b07782e4b06a911a",
-                "718dff747a2f4d368899aa11d43ac140",
-                "fb4a176349614ad5bec5cc772238511d",
-                "c9fa7915553e4c2cbe24636080216648"
+                "92ed9f5ba90f42d6a40d782ed46ea182",
+                "1f325e6bca384fce828353a5232de91f",
+                "8e8064734ef94a528f0615ea013fa386",
+                "8400496e47be42308d1f17623440039d",
+                "a0a235ecb55c47158d20bf3d925e5d6e",
+                "1f951ff4b1cf416f832f3070c5661b1a",
+                "a557b2afa01c438aacdb3f95a92b71bf",
+                "d1bf73346b2a4903a5e7dfd1c631e0a7",
+                "5ca3267edaf54e0c9a463069a7e892c2",
+                "fe18a8c1ef4e4d969e17988a8e1c22d0",
+                "4ebeb7241c1a4285826f2f25a17ed80b",
+                "084f2326c4034b76abb1a2c9747928ca"
             ]
         }
-    },
-    "47485282": {
-        "relapse_sessions": [
-            {
-                "current_step": "relapse_custom_behavior",
-                "date_time": "05.09.2024 18:17",
-                "situation": "Дома",
-                "thoughts": "Я просто хочу сдаться так как не вижу в этом смысла",
-                "emotion_type": "Тревога",
-                "emotion_score": 5,
-                "physical": "Мания",
-                "behavior": null
-            }
-        ],
-        "current_step": null,
-        "smoking_type": "/stop_smoking",
-        "intensity": "Сигареты",
-        "period": "/stop_smoking",
-        "stop_smoking_time": "2024-09-05 18:14:05"
     }
 }
