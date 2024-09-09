@@ -5,9 +5,11 @@ from utils.content import MESSAGES
 
 scheduler = AsyncIOScheduler()
 
+if not scheduler.running:
+    scheduler.start()
+
 async def send_message(bot: Bot, user_id: int, text: str):
     await bot.send_message(user_id, text, parse_mode="Markdown")
-
 
 def schedule_messages(bot: Bot, user_id: int, start_time: datetime):
     job_ids = []
@@ -15,11 +17,9 @@ def schedule_messages(bot: Bot, user_id: int, start_time: datetime):
     for hours, message in MESSAGES.items():
         send_time = start_time + timedelta(hours=hours)
         job = scheduler.add_job(send_message, 'date', run_date=send_time, args=[bot, user_id, message])
-        job_ids.append(job.id)  # Сохраняем идентификаторы задач
+        job_ids.append(job.id)
     
-    scheduler.start()
     return job_ids
-
 
 def cancel_scheduled_messages(job_ids):
     for job_id in job_ids:

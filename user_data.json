@@ -26,7 +26,38 @@
         "smoking_type": "/relapse_warning",
         "intensity": "/relapse_warning",
         "period": "Более 10 лет",
-        "stop_smoking_time": "2024-09-05 17:24:38"
+        "stop_smoking_time": "2024-09-09 10:37:17",
+        "job_ids": [
+            "fcc1c3d3e9ff4f75bc6a7dfebf898906",
+            "d99cc53a34394fccada7c27060ce3f93",
+            "902bf2209a6449379f9113fa5f289377",
+            "a98bd04776154aa2aeade0f08b621649",
+            "5501f336fbcf4747849091efec097bd6",
+            "73fc45bcc3f54a86b85eb74b3b2f121e",
+            "7b32070818074a3d9251d4ff655f5150",
+            "d3804d7ba05e4b7a851ba1e2cacdf439",
+            "21519ea506464cdeba3d26b1219dbd38",
+            "8632d1e49b20485b96423c9bc0123424",
+            "198ebab92e9149a186849b02a0bb21d1",
+            "c04d5fdc2d1e42c792e3f38529b55f3c"
+        ],
+        "stop_smoking_data": {
+            "time": "2024-09-09 10:43:35",
+            "jobs": [
+                "c1f4fc9f2dad422f8e251f73b7ea52b9",
+                "b619fa9560fb4ec09d3bf4a5ca804353",
+                "e831c6ec1d214171ac6caf7b4358b09b",
+                "b5d1f5bba34b442b8341c5baef17a9e8",
+                "cfd554ba94ad4f1086ab816fc9086009",
+                "4be53764927d4a4288800088452da770",
+                "ff7b08f6f4ec40c7af5766139fdf80c4",
+                "b21db6bb2e0b4f599ee4b6b322bf5357",
+                "19a7ce59a4e945a1b07782e4b06a911a",
+                "718dff747a2f4d368899aa11d43ac140",
+                "fb4a176349614ad5bec5cc772238511d",
+                "c9fa7915553e4c2cbe24636080216648"
+            ]
+        }
     },
     "47485282": {
         "relapse_sessions": [
