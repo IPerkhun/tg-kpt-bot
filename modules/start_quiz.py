@@ -1,11 +1,10 @@
 from aiogram import types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from db.data_manager import (
+    get_last_start_quiz,
+    update_last_start_quiz,
     get_user_data,
     update_user_data,
-    add_start_quiz,
-    update_start_quiz,
-    get_last_start_quiz,
 )
 from utils.content import (
     WELCOME_MESSAGE,
@@ -18,22 +17,17 @@ from utils.content import (
     CUSTOM_REASON_PROMPT,
     FINISH_QUIZ_MESSAGE,
 )
+from utils.data_models import StartQuiz
 
 
 # Старт квиза и добавление пустой записи в start_quizes
 async def start_quiz(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
     # Добавляем новый пустой квиз
-    new_quiz = {
-        "current_step": "step1",
-        "smoking_type": None,
-        "intensity": None,
-        "period": None,
-        "reason": None,
-    }
+    new_quiz = StartQuiz().to_dict()
+    new_quiz["current_step"] = "step1"
+    user_data = get_user_data(user_id)
     user_data["start_quizes"].append(new_quiz)
-
     update_user_data(user_id, user_data)
 
     keyboard = ReplyKeyboardMarkup(
@@ -51,12 +45,11 @@ async def start_quiz(message: types.Message):
 # Обработка первого шага (выбор типа курения)
 async def handle_quiz_step1(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
     last_quiz = get_last_start_quiz(user_id)
 
     last_quiz["smoking_type"] = message.text
     last_quiz["current_step"] = "step2"
-    update_start_quiz(user_id, last_quiz)
+    update_last_start_quiz(user_id, last_quiz)
 
     if message.text == "Сигареты":
         keyboard = ReplyKeyboardMarkup(
@@ -112,12 +105,11 @@ async def handle_quiz_step1(message: types.Message):
 # Обработка второго шага (интенсивность)
 async def handle_quiz_step2(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
     last_quiz = get_last_start_quiz(user_id)
 
     last_quiz["intensity"] = message.text
     last_quiz["current_step"] = "step3"
-    update_start_quiz(user_id, last_quiz)
+    update_last_start_quiz(user_id, last_quiz)
 
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -138,7 +130,7 @@ async def handle_quiz_step3(message: types.Message):
 
     last_quiz["period"] = message.text
     last_quiz["current_step"] = "step4"
-    update_start_quiz(user_id, last_quiz)
+    update_last_start_quiz(user_id, last_quiz)
 
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -163,7 +155,7 @@ async def handle_quiz_step4(message: types.Message):
     else:
         last_quiz["reason"] = message.text
         last_quiz["current_step"] = "finished"
-        update_start_quiz(user_id, last_quiz)
+        update_last_start_quiz(user_id, last_quiz)
         await finish_quiz(message)
 
 
@@ -172,7 +164,7 @@ async def handle_custom_reason(message: types.Message):
     user_id = message.from_user.id
     last_quiz = get_last_start_quiz(user_id)
     last_quiz["reason"] = message.text
-    update_start_quiz(user_id, last_quiz)
+    update_last_start_quiz(user_id, last_quiz)
     await finish_quiz(message)
 
 
@@ -183,7 +175,7 @@ async def finish_quiz(message: types.Message):
     last_quiz = get_last_start_quiz(user_id)
 
     last_quiz["current_step"] = "finished"
-    update_start_quiz(user_id, last_quiz)
+    update_last_start_quiz(user_id, last_quiz)
 
     await message.answer(
         FINISH_QUIZ_MESSAGE, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown"

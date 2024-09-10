@@ -19,18 +19,11 @@ from dataclasses import asdict
 # Функция для старта сценария записи голосового сообщения
 async def start_voice_recording(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
+
     last_voice_data = VoiceData()
     last_voice_data.current_step = "waiting_for_voice"
 
-    # # Проверяем, что пользователь не начал запись голосового сообщения
-    # if last_voice_data and not last_voice_data["confirmed"]:
-    #     await message.answer(
-    #         "Пожалуйста, подтвердите или перезапишите предыдущее голосовое сообщение."
-    #     )
-    #     return
-
-    # Обновляем данные пользователя
+    user_data = get_user_data(user_id)
     user_data["voices"].append(asdict(last_voice_data))
     update_user_data(user_id, user_data)
 

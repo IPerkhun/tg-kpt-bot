@@ -1,61 +1,25 @@
-# %%
-import openai
-import os
-from dotenv import load_dotenv
-from typing import List, Dict
-
-load_dotenv()
-
-API_KEY = os.getenv("OPENAI_API_KEY")
-
-PROMPT_INSTRUCTIONS = """
-Ты КПТ психотерапевт. Твоя задача - помочь пациенту справиться с никотиновой зависимостью. Пациент рассказывает тебе о своих заметках о том как он справлялся с желанием курить. 
-Заметки получаешь в виде json.
-{
-    "current_step": null,
-    "date_time": "03.09.2024 12:01",
-    "situation": "На вечеринке",
-    "thoughts": "Курение поможет мне успокоиться",
-    "emotion_type": "Тревога",
-    "emotion_score": 4,
-    "physical": "Дрожь в руках",
-    "behavior": "Сделать физическую нагрузку"
-},
-
-Так же ты будешь получать дату когда пациент решил бросить курить.
-Верни рекомендации и поддержи его в его нелёгком решении. 
-Это должно быть короткое сообщение 30-50 слов, которое поможет пациенту справиться с желанием курить.
-Должно несколько советов действий, которые помогут пациенту справиться с желанием курить и максимум одно поддерживающее утверждение.
-
-Примеры ответов:
-Ты на верном пути! В моменты тревоги попробуй заменить курение на глубокое дыхание или короткую прогулку. Это поможет снизить напряжение. Также может помочь записать свои мысли и чувства. Ты справляешься с этим! Я в тебя верю!
-"""
+from db.data_manager import get_user_data
 
 
-class GPTTherapist:
-    def __init__(self, api_key: str = API_KEY):
-        self.prompt = PROMPT_INSTRUCTIONS
-        openai.api_key = api_key
-        self.client = openai.OpenAI()
+# Функция для получения всех заметок
+def get_all_notes(user_id):
+    user_data = get_user_data(user_id)
+    sessions = user_data.get("relapse_sessions", [])
 
-    def _build_user_input(
-        self, start_date: str, current_date: str, data: List[Dict]
-    ) -> str:
-        user_input = f"{data} не курю с {start_date} время сейчас {current_date}"
-        return user_input
+    if not sessions:
+        return None
 
-    def get_help(self, data: List[Dict], start_date=None, current_date=None) -> str:
-        user_input = self._build_user_input(start_date, current_date, data)
-        completion = self.client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": self.prompt},
-                {"role": "user", "content": user_input},
-            ],
-            max_tokens=200,
-            temperature=1.0,
+    notes_text = ""
+    for idx, session in enumerate(sessions, 1):
+        notes_text += f"📄 *Заметка {idx}*\n"
+        notes_text += f"🗓 *Дата*: {session.get('date_time', 'Не указана')}\n"
+        notes_text += f"📍 *Ситуация*: {session.get('situation', 'Не указана')}\n"
+        notes_text += f"💭 *Мысли*: {session.get('thoughts', 'Не указаны')}\n"
+        notes_text += f"😶‍🌫️ *Эмоции*: {session.get('emotion_type', 'Не указаны')} (Оценка: {session.get('emotion_score', 'Не указана')})\n"
+        notes_text += (
+            f"💪 *Физическое состояние*: {session.get('physical', 'Не указано')}\n"
         )
-        return completion.choices[0].message.content
+        notes_text += f"🎯 *Поведение*: {session.get('behavior', 'Не указано')}\n"
+        notes_text += f"{'-'*30}\n\n"
 
-
-# %%
+    return notes_text

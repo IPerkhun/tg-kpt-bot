@@ -1,11 +1,12 @@
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
+import os
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from dotenv import load_dotenv
-import os
+from aiogram.client.default import DefaultBotProperties
+from aiogram.types import BotCommand
+from aiogram.enums import ParseMode
 
 from modules.start_quiz import (
     start_quiz,
@@ -32,22 +33,19 @@ from modules.speak_emotion import (
     handle_voice_message,
     handle_confirmation,
 )
-
-
 from modules.stop_smoking import cmd_stop_smoking
-from db.data_manager import get_user_data, get_last_relapse_session
-from aiogram.types import BotCommand
+from modules.note_manager import get_all_notes
+from db.data_manager import get_last_relapse_session, get_last_start_quiz
 from utils.content import help_text
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
+from utils.scheduler import start_scheduler
 
 load_dotenv()
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 bot = Bot(
     token=os.environ["TG_API_TOKEN"],
     default=DefaultBotProperties(
-        parse_mode=ParseMode.HTML,
+        parse_mode=ParseMode.MARKDOWN,
     ),
 )
 dp = Dispatcher()
@@ -67,11 +65,6 @@ async def set_bot_commands(bot: Bot):
     await bot.set_my_commands(commands)
 
 
-@dp.message(Command("start"))
-async def cmd_start(message: types.Message):
-    await start_quiz(message)
-
-
 @dp.message(Command("help"))
 async def cmd_help(message: types.Message):
     await message.answer(
@@ -79,34 +72,24 @@ async def cmd_help(message: types.Message):
     )
 
 
+# Обработчик для команды /notes
 @dp.message(Command("notes"))
 async def cmd_notes(message: types.Message):
     user_id = message.from_user.id
-    sessions = get_user_data(user_id)["relapse_sessions"]
+    notes_text = get_all_notes(user_id)
 
-    if not sessions:
+    if not notes_text:
         await message.answer("У вас пока нет заметок.")
-        return
-
-    notes_text = ""
-    for idx, session in enumerate(sessions, 1):
-        notes_text += f"📄 *Заметка {idx}*\n"
-        notes_text += f"🗓 *Дата*: {session.get('date_time', 'Не указана')}\n"
-        notes_text += f"📍 *Ситуация*: {session.get('situation', 'Не указана')}\n"
-        notes_text += f"💭 *Мысли*: {session.get('thoughts', 'Не указаны')}\n"
-        notes_text += f"😶‍🌫️ *Эмоции*: {session.get('emotion_type', 'Не указаны')} (Оценка: {session.get('emotion_score', 'Не указана')})\n"
-        notes_text += (
-            f"💪 *Физическое состояние*: {session.get('physical', 'Не указано')}\n"
+    else:
+        await message.answer(
+            notes_text, reply_markup=types.ReplyKeyboardRemove(), parse_mode="Markdown"
         )
-        notes_text += f"🎯 *Поведение*: {session.get('behavior', 'Не указано')}\n"
-        notes_text += f"{'-'*30}\n\n"
-
-    await message.answer(
-        notes_text, reply_markup=types.ReplyKeyboardRemove(), parse_mode="Markdown"
-    )
 
 
-from db.data_manager import get_last_start_quiz
+# Обработчик для команды /start
+@dp.message(Command("start"))
+async def cmd_start(message: types.Message):
+    await start_quiz(message)
 
 
 # Обработчики для этапов квиза
@@ -150,7 +133,7 @@ async def handle_quiz_custom_reason(message: types.Message):
     await handle_custom_reason(message)
 
 
-# Обработчики для опроса при желании сорваться
+# Обработчики для опроса при желании сорваться /relapse_warning
 @dp.message(Command("relapse_warning"))
 async def cmd_relapse_warning(message: types.Message):
     await start_relapse_quiz(message)
@@ -249,9 +232,7 @@ async def handle_voice_confirmation(message: types.Message):
 
 
 async def main():
-    # Планировщик
-    scheduler = AsyncIOScheduler()
-    scheduler.start()
+    start_scheduler()
     await set_bot_commands(bot)
     await dp.start_polling(bot)
 

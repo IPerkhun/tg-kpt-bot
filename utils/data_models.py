@@ -39,3 +39,12 @@ class VoiceData:
 
     def to_dict(self):
         return dataclasses.asdict(self)
+
+
+@dataclasses.dataclass
+class StopSmokingData:
+    time: str
+    jobs: list
+
+    def to_dict(self):
+        return dataclasses.asdict(self)

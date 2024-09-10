@@ -3,92 +3,125 @@
         "relapse_sessions": [
             {
                 "current_step": null,
-                "date_time": "10.09.2024 01:27",
-                "situation": "На работе",
+                "date_time": "10.09.2024 16:24",
+                "situation": "На вечеринке",
+                "thoughts": "Сигарета поможет мне сконцентрироваться",
+                "emotion_type": "Возбуждение",
+                "emotion_score": 3,
+                "physical": "я просто устал",
+                "behavior": "Набрать по телефону близкому человеку"
+            }
+        ],
+        "voices": [
+            {
+                "current_step": "finished",
+                "file_id": "AwACAgIAAxkBAAIMWWbgSIW9NUN9bUkrTRTItk5NBJShAAJ_XwACR50AAUsHiEi0KkU-DTYE",
+                "text": "А, ну, типа да, ну, нет.",
+                "confirmed": true
+            }
+        ],
+        "start_quizes": [],
+        "stop_smoking_data": {
+            "time": "2024-09-10 16:21:22",
+            "jobs": [
+                "bfb1212ea8d94a5793ceb30cded4417b",
+                "078865bb3c284dde98e22517b9baf222",
+                "e0d18a463e8e4d2395323f5443383853",
+                "9d75d23b68b94ff48fe6d4238694d8e5",
+                "df1be165f1e6447da5ccba30fed68372",
+                "001d75ac2d0e4827a13bf2f3b33c0e2e",
+                "6418637eca114a1591707032458d5323",
+                "5f5c3431eee34f4096ffb2aea6ff4eaa",
+                "218fc02b56c94bcebe8c55d630cfc4aa",
+                "11d2835e6a6c43928ec63267ad0ea21e",
+                "78e4fa975884405289a6807041a4774d",
+                "eacaf6deae6446339ced90f7728ce2f5"
+            ]
+        }
+    },
+    "61350155": {
+        "relapse_sessions": [
+            {
+                "current_step": null,
+                "date_time": "10.09.2024 16:35",
+                "situation": "На вечеринке",
                 "thoughts": "Я просто хочу сдаться так как не вижу в этом смысла",
+                "emotion_type": "Возбуждение",
+                "emotion_score": 3,
+                "physical": "Все окей",
+                "behavior": "Подышать свежим воздухом"
+            },
+            {
+                "current_step": null,
+                "date_time": "10.09.2024 16:35",
+                "situation": "в подвале",
+                "thoughts": "ааааа ыыыыы",
                 "emotion_type": "Злость",
-                "emotion_score": 4,
-                "physical": "fknkt",
-                "behavior": "knrvkrn"
+                "emotion_score": 5,
+                "physical": null,
+                "behavior": "Попить чай"
+            },
+            {
+                "current_step": null,
+                "date_time": "10.09.2024 16:49",
+                "situation": "Дома",
+                "thoughts": "Сигарета поможет мне сконцентрироваться",
+                "emotion_type": "Возбуждение",
+                "emotion_score": 3,
+                "physical": "горит жопа",
+                "behavior": "арбуз арбуз пернуть"
             }
         ],
         "voices": [
             {
                 "current_step": "waiting_for_voice",
-                "file_id": "AwACAgIAAxkBAAIJ3mbfZ0gM0qWNtIsocHiPsdwwYqI1AAKDWAAC_Kj4Stc95MC1H-v4NgQ",
-                "text": "Тестовое голосовое сообщение.",
+                "file_id": "AwACAgIAAxkBAAIMTWbgR__-bToPRiexxLobcGDlKrjNAALeUwACn0kJS7Afuk_a3CbWNgQ",
+                "text": "О, чел, я хочу покурить, у меня всё болит, как же хочется сделать чашечку.",
                 "confirmed": false
             },
             {
-                "current_step": "waiting_for_confirmation",
-                "file_id": "AwACAgIAAxkBAAIJ3mbfZ0gM0qWNtIsocHiPsdwwYqI1AAKDWAAC_Kj4Stc95MC1H-v4NgQ",
-                "text": "Тестовое голосовое сообщение.",
+                "current_step": "finished",
+                "file_id": "AwACAgIAAxkBAAIMUWbgSFTwXjMXag40do7w33-6JIbNAALiUwACn0kJS_zhcZFa-K2-NgQ",
+                "text": "Как же хочется покурить!",
                 "confirmed": true
             },
             {
-                "current_step": "waiting_for_voice",
-                "file_id": null,
-                "text": null,
-                "confirmed": false
+                "current_step": "finished",
+                "file_id": "AwACAgIAAxkBAAIMoGbgTELFdL1B0JbpTRwAARfNCNuMMAACMFQAAp9JCUtdrCosTUwmJzYE",
+                "text": "Пипи и Каки в Пипи-Какаланде",
+                "confirmed": true
             },
             {
-                "current_step": "waiting_for_voice",
-                "file_id": "AwACAgIAAxkBAAIJ3mbfZ0gM0qWNtIsocHiPsdwwYqI1AAKDWAAC_Kj4Stc95MC1H-v4NgQ",
-                "text": "Тестовое голосовое сообщение.",
-                "confirmed": false
-            },
-            {
-                "current_step": "waiting_for_voice",
-                "file_id": null,
-                "text": null,
-                "confirmed": false
+                "current_step": "finished",
+                "file_id": "AwACAgIAAxkBAAIMp2bgTGCzu0kO9ZewkCK4J1Vcrck-AAIyVAACn0kJS_NCBHAyTGvsNgQ",
+                "text": "Ya ya ya, go go Jumbo, ya ya ya.",
+                "confirmed": true
             }
         ],
         "start_quizes": [
             {
                 "current_step": "finished",
-                "smoking_type": "Айкос",
-                "intensity": "1 пачка и более в день",
-                "period": "Более 10 лет",
-                "reason": "Свой вариант ✍️"
-            },
-            {
-                "current_step": "finished",
-                "smoking_type": "Айкос",
-                "intensity": "1 пачка и более в день",
-                "period": "Более 10 лет",
-                "reason": "Свой вариант ✍️"
-            },
-            {
-                "current_step": "finished",
-                "smoking_type": "Айкос",
-                "intensity": "1 пачка и более в день",
-                "period": "Более 10 лет",
-                "reason": "Свой вариант ✍️"
-            },
-            {
-                "current_step": "finished",
-                "smoking_type": "Айкос",
-                "intensity": "1 пачка и более в день",
-                "period": "Более 10 лет",
-                "reason": "ghbdtn"
+                "smoking_type": "Электронная сигарета или HQD",
+                "intensity": "Дымлю каждые 2-3 часа ⏰",
+                "period": "1-3 года",
+                "reason": "Не хочу чтобы от меня воняло 🚫👃"
             }
         ],
         "stop_smoking_data": {
-            "time": "2024-09-10 01:31:32",
+            "time": "2024-09-10 16:23:39",
             "jobs": [
-                "92ed9f5ba90f42d6a40d782ed46ea182",
-                "1f325e6bca384fce828353a5232de91f",
-                "8e8064734ef94a528f0615ea013fa386",
-                "8400496e47be42308d1f17623440039d",
-                "a0a235ecb55c47158d20bf3d925e5d6e",
-                "1f951ff4b1cf416f832f3070c5661b1a",
-                "a557b2afa01c438aacdb3f95a92b71bf",
-                "d1bf73346b2a4903a5e7dfd1c631e0a7",
-                "5ca3267edaf54e0c9a463069a7e892c2",
-                "fe18a8c1ef4e4d969e17988a8e1c22d0",
-                "4ebeb7241c1a4285826f2f25a17ed80b",
-                "084f2326c4034b76abb1a2c9747928ca"
+                "020b5d26cc6247d2b53511440e357fa3",
+                "720b52286f0b41ceb048a32ca3f6d7a9",
+                "1b833a771597407989cb586903c266e0",
+                "7341b421fab84526816509ac0c788365",
+                "d3170742338647c7ba065f03873e143a",
+                "55d931c3c68e463a90b6be1b4e567065",
+                "f886011716b844d2be8d9e39e6e46d09",
+                "243ab236e4eb48d19841a3e3ae79cbad",
+                "622eb46242614e20af7f51eedaaddfad",
+                "730515ebba0a42049d63096fd4a2cc4a",
+                "81674ccc0d8e4171a31de46079405800",
+                "98433d81704c411a82cacfffd9da6441"
             ]
         }
     }

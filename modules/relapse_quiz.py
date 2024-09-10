@@ -9,7 +9,7 @@ from aiogram.types import (
 from db.data_manager import get_user_data, update_user_data
 from datetime import datetime
 from utils.data_models import RelapseSession
-from modules.note_manager import GPTTherapist
+from modules.gpt_therapist import GPTTherapist
 from dataclasses import asdict
 from utils.content import (
     RELAPSE_QUIZ_START_MESSAGE,
@@ -266,9 +266,7 @@ async def finish_relapse_quiz(message: types.Message):
 
     # Сообщение о завершении опроса
     await message.answer(
-        "*Отличная работа!*\n\n"
-        "Ты завершил очередной шаг на пути к здоровой жизни. Ниже твоя короткая заметка. "
-        "Сейчас пришлю несколько советов, которые помогут тебе двигаться дальше.",
+        RELAPSE_QUIZ_FINISH_MESSAGE,
         reply_markup=ReplyKeyboardRemove(),
         parse_mode="Markdown",
     )
@@ -287,7 +285,7 @@ async def finish_relapse_quiz(message: types.Message):
     await message.answer(text, parse_mode="Markdown")
 
     # Пауза на 5 секунд перед отправкой рекомендаций
-    await asyncio.sleep(10)
+    await asyncio.sleep(5)
 
     # Отправка рекомендаций от GPT-терапевта
     await message.answer(response, parse_mode="Markdown")

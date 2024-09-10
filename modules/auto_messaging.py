@@ -2,11 +2,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime, timedelta
 from aiogram import Bot
 from utils.content import MESSAGES
+from utils.scheduler import get_scheduler
 
-scheduler = AsyncIOScheduler()
-
-if not scheduler.running:
-    scheduler.start()
+scheduler = get_scheduler()
 
 
 async def send_message(bot: Bot, user_id: int, text: str):
