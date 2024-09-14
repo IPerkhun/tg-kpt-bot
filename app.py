@@ -1,52 +1,34 @@
-import os
 import asyncio
 import logging
+import os
+
 from aiogram import Bot, Dispatcher, types
-from aiogram.filters import Command
-from dotenv import load_dotenv
 from aiogram.client.default import DefaultBotProperties
-from aiogram.types import BotCommand
 from aiogram.enums import ParseMode
+from aiogram.filters import Command
+from aiogram.types import BotCommand
+from dotenv import load_dotenv
 
-from modules.start_quiz import (
-    start_quiz,
-    handle_quiz_step1,
-    handle_quiz_step2,
-    handle_quiz_step3,
-    handle_quiz_step4,
-    handle_custom_reason,
+from db.data_manager import (
+    get_last_relapse_session,
+    get_last_start_quiz,
+    get_last_voice_user_data,
 )
-
-from modules.relapse_quiz import (
-    start_relapse_quiz,
-    handle_relapse_situation,
-    handle_relapse_thoughts,
-    handle_relapse_custom_message,
-    handle_relapse_emotions,
-    handle_relapse_emotion_score,
-    handle_relapse_physical,
-    handle_relapse_behavior,
-)
-
-from modules.speak_emotion import (
-    start_voice_recording,
-    handle_voice_message,
-    handle_confirmation,
-)
-from modules.stop_smoking import cmd_stop_smoking
 from modules.note_manager import get_all_notes
-from db.data_manager import get_last_relapse_session, get_last_start_quiz
+from modules.relapse_quiz import start_relapse_quiz, handle_relapse_step
+from modules.speak_emotion import start_voice_recording, handle_voice_step
+from modules.start_quiz import start_quiz, handle_quiz_step
+from modules.stop_smoking import cmd_stop_smoking
 from utils.content import help_text
 from utils.scheduler import start_scheduler
+
 
 load_dotenv()
 
 logging.basicConfig(level=logging.DEBUG)
 bot = Bot(
     token=os.environ["TG_API_TOKEN"],
-    default=DefaultBotProperties(
-        parse_mode=ParseMode.MARKDOWN,
-    ),
+    default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
 )
 dp = Dispatcher()
 
@@ -92,45 +74,11 @@ async def cmd_start(message: types.Message):
     await start_quiz(message)
 
 
-# Обработчики для этапов квиза
 @dp.message(
     lambda message: get_last_start_quiz(message.from_user.id).get("current_step")
-    == "step1"
 )
-async def handle_quiz_1(message: types.Message):
-    await handle_quiz_step1(message)
-
-
-@dp.message(
-    lambda message: get_last_start_quiz(message.from_user.id).get("current_step")
-    == "step2"
-)
-async def handle_quiz_2(message: types.Message):
-    await handle_quiz_step2(message)
-
-
-@dp.message(
-    lambda message: get_last_start_quiz(message.from_user.id).get("current_step")
-    == "step3"
-)
-async def handle_quiz_3(message: types.Message):
-    await handle_quiz_step3(message)
-
-
-@dp.message(
-    lambda message: get_last_start_quiz(message.from_user.id).get("current_step")
-    == "step4"
-)
-async def handle_quiz_4(message: types.Message):
-    await handle_quiz_step4(message)
-
-
-@dp.message(
-    lambda message: get_last_start_quiz(message.from_user.id).get("current_step")
-    == "custom_reason_start_quiz"
-)
-async def handle_quiz_custom_reason(message: types.Message):
-    await handle_custom_reason(message)
+async def handle_quiz(message: types.Message):
+    await handle_quiz_step(message)
 
 
 # Обработчики для опроса при желании сорваться /relapse_warning
@@ -141,63 +89,10 @@ async def cmd_relapse_warning(message: types.Message):
 
 @dp.message(
     lambda message: get_last_relapse_session(message.from_user.id).get("current_step")
-    == "relapse_situation"
+    is not None
 )
-async def handle_relapse_2(message: types.Message):
-    await handle_relapse_situation(message)
-
-
-@dp.message(
-    lambda message: get_last_relapse_session(message.from_user.id).get("current_step")
-    == "relapse_thoughts"
-)
-async def handle_relapse_3(message: types.Message):
-    await handle_relapse_thoughts(message)
-
-
-@dp.message(
-    lambda message: get_last_relapse_session(message.from_user.id).get("current_step")
-    in [
-        "relapse_custom_situation",
-        "relapse_custom_thoughts",
-        "relapse_custom_physical",
-        "relapse_custom_behavior",
-    ]
-)
-async def handle_custom_message(message: types.Message):
-    await handle_relapse_custom_message(message)
-
-
-@dp.message(
-    lambda message: get_last_relapse_session(message.from_user.id).get("current_step")
-    == "relapse_emotions"
-)
-async def handle_relapse_4(message: types.Message):
-    await handle_relapse_emotions(message)
-
-
-@dp.message(
-    lambda message: get_last_relapse_session(message.from_user.id).get("current_step")
-    == "relapse_emotion_score"
-)
-async def handle_relapse_5_score(message: types.Message):
-    await handle_relapse_emotion_score(message)
-
-
-@dp.message(
-    lambda message: get_last_relapse_session(message.from_user.id).get("current_step")
-    == "relapse_physical"
-)
-async def handle_relapse_5(message: types.Message):
-    await handle_relapse_physical(message, bot)
-
-
-@dp.message(
-    lambda message: get_last_relapse_session(message.from_user.id).get("current_step")
-    == "relapse_behavior"
-)
-async def handle_relapse_6(message: types.Message):
-    await handle_relapse_behavior(message)
+async def handle_relapse(message: types.Message):
+    await handle_relapse_step(message, bot)
 
 
 # Обработчик для команды /stop_smoking
@@ -212,23 +107,12 @@ async def cmd_speak_emotion(message: types.Message):
     await start_voice_recording(message)
 
 
-from db.data_manager import get_last_voice_user_data
-
-
 @dp.message(
     lambda message: get_last_voice_user_data(message.from_user.id).get("current_step")
-    == "waiting_for_voice"
+    is not None
 )
-async def handle_voice_input(message: types.Message):
-    await handle_voice_message(message, bot)
-
-
-@dp.message(
-    lambda message: get_last_voice_user_data(message.from_user.id).get("current_step")
-    == "waiting_for_confirmation"
-)
-async def handle_voice_confirmation(message: types.Message):
-    await handle_confirmation(message)
+async def handle_voice(message: types.Message):
+    await handle_voice_step(message, bot)
 
 
 async def main():

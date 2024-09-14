@@ -1,12 +1,13 @@
 from aiogram import types
 import asyncio
+from aiogram import types, Bot
 from aiogram.types import (
     ContentType,
     ReplyKeyboardMarkup,
     KeyboardButton,
     ReplyKeyboardRemove,
 )
-from db.data_manager import get_user_data, update_user_data
+from db.data_manager import get_user_data, update_user_data, get_last_relapse_session
 from datetime import datetime
 from utils.data_models import RelapseSession
 from modules.gpt_therapist import GPTTherapist
@@ -261,17 +262,14 @@ async def finish_relapse_quiz(message: types.Message):
     current_session["current_step"] = None
     update_user_data(user_id, user_data)
 
-    # Получение рекомендаций от GPT-терапевта
     response = GPTTherapist().get_help(user_data["relapse_sessions"][:-1])
 
-    # Сообщение о завершении опроса
     await message.answer(
         RELAPSE_QUIZ_FINISH_MESSAGE,
         reply_markup=ReplyKeyboardRemove(),
         parse_mode="Markdown",
     )
 
-    # Формирование текста с заполненными данными
     text = (
         f"📝 *Твои ответы:*\n\n"
         f"*Ситуация:* {current_session['situation']}\n"
@@ -281,13 +279,8 @@ async def finish_relapse_quiz(message: types.Message):
         f"*Поведение:* {current_session['behavior']}\n"
     )
 
-    # Отправка заполненных данных
     await message.answer(text, parse_mode="Markdown")
-
-    # Пауза на 5 секунд перед отправкой рекомендаций
     await asyncio.sleep(5)
-
-    # Отправка рекомендаций от GPT-терапевта
     await message.answer(response, parse_mode="Markdown")
 
 
@@ -324,3 +317,32 @@ async def handle_relapse_custom_message(message: types.Message):
     else:
         await message.answer(RELAPSE_QUIZ_ERROR_MESSAGE)
         await start_relapse_quiz(message)
+
+
+RELAPSE_HANDLERS_MAP = {
+    "relapse_situation": handle_relapse_situation,
+    "relapse_thoughts": handle_relapse_thoughts,
+    "relapse_custom_situation": handle_relapse_custom_message,
+    "relapse_custom_thoughts": handle_relapse_custom_message,
+    "relapse_custom_physical": handle_relapse_custom_message,
+    "relapse_custom_behavior": handle_relapse_custom_message,
+    "relapse_emotions": handle_relapse_emotions,
+    "relapse_emotion_score": handle_relapse_emotion_score,
+    "relapse_physical": handle_relapse_physical,
+    "relapse_behavior": handle_relapse_behavior,
+}
+
+
+async def handle_relapse_step(message: types.Message, bot: Bot):
+    user_id = message.from_user.id
+    last_session = get_last_relapse_session(user_id)
+    current_step = last_session.get("current_step")
+
+    handler = RELAPSE_HANDLERS_MAP.get(current_step)
+    if handler:
+        if current_step in ["relapse_physical"]:
+            await handler(message, bot)
+        else:
+            await handler(message)
+    else:
+        await message.answer("Не могу определить текущий шаг. Попробуйте снова.")

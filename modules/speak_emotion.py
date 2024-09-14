@@ -100,3 +100,27 @@ async def handle_confirmation(message: types.Message):
         await message.answer(
             "Пожалуйста, воспользуйтесь кнопками для подтверждения или перезаписи."
         )
+
+
+VOICE_HANDLERS_MAP = {
+    "waiting_for_voice": handle_voice_message,
+    "waiting_for_confirmation": handle_confirmation,
+}
+
+
+async def handle_voice_step(message: types.Message, bot: Bot):
+    user_id = message.from_user.id
+    last_voice_data = get_last_voice_user_data(user_id)
+    current_step = last_voice_data.get("current_step")
+
+    # Находим нужный обработчик на основе текущего шага
+    handler = VOICE_HANDLERS_MAP.get(current_step)
+
+    if handler:
+        # Если шаг требует bot как аргумент, передаем его
+        if current_step == "waiting_for_voice":
+            await handler(message, bot)
+        else:
+            await handler(message)
+    else:
+        await message.answer("Не могу определить текущий шаг. Попробуйте снова.")

@@ -127,7 +127,6 @@ async def handle_quiz_step2(message: types.Message):
 async def handle_quiz_step3(message: types.Message):
     user_id = message.from_user.id
     last_quiz = get_last_start_quiz(user_id)
-
     last_quiz["period"] = message.text
     last_quiz["current_step"] = "step4"
     update_last_start_quiz(user_id, last_quiz)
@@ -171,12 +170,31 @@ async def handle_custom_reason(message: types.Message):
 # Завершение квиза
 async def finish_quiz(message: types.Message):
     user_id = message.from_user.id
-
     last_quiz = get_last_start_quiz(user_id)
-
     last_quiz["current_step"] = "finished"
     update_last_start_quiz(user_id, last_quiz)
 
     await message.answer(
         FINISH_QUIZ_MESSAGE, reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown"
     )
+
+
+quiz_step_handlers = {
+    "step1": handle_quiz_step1,
+    "step2": handle_quiz_step2,
+    "step3": handle_quiz_step3,
+    "step4": handle_quiz_step4,
+    "custom_reason_start_quiz": handle_custom_reason,
+}
+
+
+# Универсальная функция для обработки шагов квиза
+async def handle_quiz_step(message: types.Message):
+    user_id = message.from_user.id
+    current_step = get_last_start_quiz(user_id).get("current_step")
+
+    if current_step in quiz_step_handlers:
+        # Вызов соответствующего обработчика шага
+        await quiz_step_handlers[current_step](message)
+    else:
+        await message.answer("Неизвестный шаг квиза.")
