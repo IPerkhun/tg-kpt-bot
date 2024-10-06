@@ -1,4 +1,5 @@
 from db.data_manager import get_user_data
+from aiogram import types
 
 
 # Функция для получения всех заметок
@@ -23,3 +24,16 @@ def get_all_notes(user_id):
         notes_text += f"{'-'*30}\n\n"
 
     return notes_text
+
+
+# Функция для обработки команды /notes
+async def handle_notes_command(message: types.Message):
+    user_id = message.from_user.id
+    notes_text = get_all_notes(user_id)
+
+    if not notes_text:
+        await message.answer("У вас пока нет заметок.")
+    else:
+        await message.answer(
+            notes_text, reply_markup=types.ReplyKeyboardRemove(), parse_mode="Markdown"
+        )

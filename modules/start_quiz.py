@@ -21,15 +21,19 @@ from utils.data_models import StartQuiz
 
 
 # Старт квиза и добавление пустой записи в start_quizes
-async def start_quiz(message: types.Message):
-    user_id = message.from_user.id
+async def start_quiz(message: types.Message, user_id: int = None):
+    if user_id is None:
+        user_id = message.from_user.id
+    else:
+        user_id = user_id
+
     # Добавляем новый пустой квиз
     new_quiz = StartQuiz().to_dict()
     new_quiz["current_step"] = "step1"
     user_data = get_user_data(user_id)
     user_data["start_quizes"].append(new_quiz)
     update_user_data(user_id, user_data)
-
+    print(get_user_data(user_id).get("start_quizes")[-1].get("current_step"))
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Сигареты")],

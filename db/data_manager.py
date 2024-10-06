@@ -48,38 +48,6 @@ def clear_user_data(user_id):
     save_data(data)
 
 
-# --- Управление голосовыми сообщениями ---
-
-
-def get_voice_user_data(user_id):
-    """Получить все голосовые сообщения пользователя"""
-    user_data = get_user_data(user_id)
-    return user_data.get("voices", [])
-
-
-def update_voice_user_data(user_id, voices):
-    """Обновить список голосовых сообщений пользователя"""
-    user_data = get_user_data(user_id)
-    user_data["voices"] = voices
-    update_user_data(user_id, user_data)
-
-
-def update_last_voice_user_data(user_id, voice_data):
-    """Обновить последнее голосовое сообщение пользователя"""
-    voices = get_voice_user_data(user_id)
-    if voices:
-        voices[-1] = voice_data
-    update_voice_user_data(user_id, voices)
-
-
-def get_last_voice_user_data(user_id):
-    """Получить последнее голосовое сообщение пользователя"""
-    voices = get_voice_user_data(user_id)
-    if voices:
-        return voices[-1]
-    return {"current_step": None}
-
-
 # --- Управление данными отказа от курения ---
 
 
@@ -144,4 +112,22 @@ def update_last_start_quiz(user_id, quiz_data):
     user_data = get_user_data(user_id)
     if user_data["start_quizes"]:
         user_data["start_quizes"][-1] = quiz_data
+    update_user_data(user_id, user_data)
+
+
+# --- Управление вводимыми сообщениями пользователя ---
+
+
+def get_user_messages(user_id):
+    """Получить все сообщения пользователя"""
+    user_data = get_user_data(user_id)
+    return user_data.get("messages", [])
+
+
+def add_user_message(user_id, message_data):
+    """Добавить новое сообщение пользователя"""
+    user_data = get_user_data(user_id)
+    if "messages" not in user_data:
+        user_data["messages"] = []
+    user_data["messages"].append(message_data)
     update_user_data(user_id, user_data)

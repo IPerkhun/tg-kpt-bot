@@ -345,4 +345,6 @@ async def handle_relapse_step(message: types.Message, bot: Bot):
         else:
             await handler(message)
     else:
-        await message.answer("Не могу определить текущий шаг. Попробуйте снова.")
+        await message.answer(
+            "handle_relapse_step - Не могу определить текущий шаг. Попробуйте снова."
+        )
