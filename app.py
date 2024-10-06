@@ -134,8 +134,6 @@ async def stop_smoking_handler(message: types.Message):
 @dp.message(
     lambda message: message.content_type == types.ContentType.TEXT
     and not message.text.startswith("/")
-    and get_last_start_quiz(message.from_user.id).get("current_step") is None
-    and get_last_relapse_session(message.from_user.id).get("current_step") is None
 )
 async def handle_message(message: types.Message):
     user_id = message.from_user.id
