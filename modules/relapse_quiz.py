@@ -52,7 +52,7 @@ async def start_relapse_quiz(message: types.Message):
     update_relapse_sessions(user_id, [new_session])
 
     await message.answer(
-        RELAPSE_QUIZ_START_MESSAGE.format(date_time=new_session.date_time),
+        RELAPSE_QUIZ_START_MESSAGE.format(date_time=new_session["date_time"]),
         reply_markup=ReplyKeyboardRemove(),
     )
 
