@@ -1,5 +1,5 @@
 import asyncio
-import os, logging, sys
+import os, logging
 
 from aiogram import Bot, Dispatcher, types, Router
 from aiogram.client.default import DefaultBotProperties
@@ -9,13 +9,15 @@ from aiogram.types import BotCommand
 from dotenv import load_dotenv
 
 from db.base import test_db_connection, create_tables
-from db.relapse import get_last_relapse_session
-from db.start_quiz import get_last_start_quiz
 
 from modules.base_handlers import handle_user_text, handle_user_voice
 from modules.note_manager import handle_notes_command
-from modules.relapse_quiz import start_relapse_quiz, handle_relapse_step
-from modules.start_quiz import start_quiz, handle_quiz_step
+from modules.relapse_quiz import (
+    start_relapse_quiz,
+    handle_relapse_step,
+    get_last_relapse_session,
+)
+from modules.start_quiz import start_quiz, handle_quiz_step, get_last_start_quiz
 from modules.stop_smoking import cmd_stop_smoking
 from modules.gpt_therapist import GPTTherapist
 
@@ -107,30 +109,6 @@ async def stop_smoking_handler(message: types.Message):
     await cmd_stop_smoking(message, bot)
 
 
-# @dp.message(
-#     lambda message: get_last_relapse_session(message.from_user.id).current_step
-#     is not None
-# )
-# async def handle_relapse(message: types.Message):
-#     await handle_relapse_step(message, bot)
-
-
-# @dp.message(
-#     lambda message: (
-#         message.content_type == types.ContentType.TEXT
-#         and not message.text.startswith("/")
-#     )
-#     and (
-#         (last_quiz := get_last_start_quiz(message.from_user.id)) is not None
-#         and last_quiz.current_step not in [None, "finished"]
-#     )
-# )
-# async def handle_quiz(message: types.Message):
-#     await handle_quiz_step(message)
-
-
-# Обработчики для текстовых и голосовых сообщений
-# Проверка на активность сессии рецидива или квиза
 @dp.message(
     lambda message: message.content_type == types.ContentType.TEXT
     and not message.text.startswith("/")

@@ -102,3 +102,36 @@ def update_last_relapse_session(user_id: int, relapse_session: RelapseSession):
             session.commit()
     finally:
         session.close()
+
+
+def get_all_notes(user_id: int):
+    session = SessionLocal()
+    try:
+        # Получаем все сессии рецидива для данного пользователя
+        sessions = (
+            session.query(RelapseSession)
+            .filter(RelapseSession.user_id == user_id)
+            .order_by(RelapseSession.timestamp.desc())
+            .all()
+        )
+
+        if not sessions:
+            return None
+
+        # Формируем текст с заметками
+        notes_text = ""
+        for idx, session in enumerate(sessions, 1):
+            notes_text += f"📄 *Заметка {idx}*\n"
+            notes_text += f"🗓 *Дата*: {session.timestamp.strftime('%Y-%m-%d %H:%M') if session.timestamp else 'Не указана'}\n"
+            notes_text += f"📍 *Ситуация*: {session.situation or 'Не указана'}\n"
+            notes_text += f"💭 *Мысли*: {session.thoughts or 'Не указаны'}\n"
+            notes_text += f"😶‍🌫️ *Эмоции*: {session.emotion_type or 'Не указаны'} (Оценка: {session.emotion_score or 'Не указана'})\n"
+            notes_text += (
+                f"💪 *Физическое состояние*: {session.physical or 'Не указано'}\n"
+            )
+            notes_text += f"🎯 *Поведение*: {session.behavior or 'Не указано'}\n"
+            notes_text += f"{'-'*30}\n\n"
+
+        return notes_text
+    finally:
+        session.close()
