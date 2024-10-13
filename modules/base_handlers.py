@@ -9,10 +9,21 @@ logging.basicConfig(level=logging.DEBUG)
 gpt_therapist = GPTTherapist()
 
 
+# Функция для форматирования контекста сообщений
+def format_messages_for_context(messages):
+    formatted_context = ""
+    for message in messages:
+        role = "user" if message.role == "user" else "bot"
+        formatted_context += f"{role}: {message.content}\n"
+    return formatted_context
+
+
+# Функция обработки пользовательского текста
 async def handle_user_text(message: types.Message):
     user_id = message.from_user.id
     user_message = message.text
 
+    # Сохраняем сообщение пользователя
     add_user_message(
         user_id,
         {
@@ -23,7 +34,9 @@ async def handle_user_text(message: types.Message):
         },
     )
 
-    context = get_last_n_messages(user_id, 5)
+    last_messages = get_last_n_messages(user_id, 5)
+    context = format_messages_for_context(last_messages)
+
     reply = gpt_therapist.get_reply(f"{context}\nuser: {user_message}")
 
     add_user_message(
@@ -65,7 +78,9 @@ async def handle_user_voice(message: types.Message, bot: Bot):
         },
     )
 
-    context = get_last_n_messages(user_id, 5)
+    last_messages = get_last_n_messages(user_id, 5)
+    context = format_messages_for_context(last_messages)
+
     reply = gpt_therapist.get_reply(f"{context}\nuser: {transcript_text}")
 
     add_user_message(

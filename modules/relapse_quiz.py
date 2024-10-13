@@ -7,10 +7,7 @@ from aiogram.types import (
     ReplyKeyboardRemove,
 )
 
-# from db.data_manager import get_user_data, update_user_data, get_last_relapse_session
 from db.relapse import (
-    RelapseSession,
-    timezone,
     get_last_relapse_session,
     update_last_relapse_session,
     add_new_relapse_session,
@@ -288,30 +285,19 @@ async def handle_relapse_custom_message(message: types.Message):
     last_session = get_last_relapse_session(user_id)
     current_step = last_session.current_step
 
-    if current_step == "relapse_custom_situation":
-        last_session.situation = message.text
-        last_session.current_step = "relapse_thoughts"
-        update_last_relapse_session(user_id, last_session)
-        await ask_thoughts(message)
+    step_handlers = {
+        "relapse_custom_situation": ("situation", "relapse_thoughts", ask_thoughts),
+        "relapse_custom_thoughts": ("thoughts", "relapse_emotions", ask_emotions),
+        "relapse_custom_physical": ("physical", "relapse_behavior", ask_behavior),
+        "relapse_custom_behavior": ("behavior", "relapse_done", finish_relapse_quiz),
+    }
 
-    elif current_step == "relapse_custom_thoughts":
-        last_session.thoughts = message.text
-        last_session.current_step = "relapse_emotions"
+    if current_step in step_handlers:
+        field, next_step, next_handler = step_handlers[current_step]
+        setattr(last_session, field, message.text)
+        last_session.current_step = next_step
         update_last_relapse_session(user_id, last_session)
-        await ask_emotions(message)
-
-    elif current_step == "relapse_custom_physical":
-        last_session.physical = message.text
-        last_session.current_step = "relapse_behavior"
-        update_last_relapse_session(user_id, last_session)
-        await ask_behavior(message)
-
-    elif current_step == "relapse_custom_behavior":
-        last_session.behavior = message.text
-        last_session.current_step = "relapse_done"
-        update_last_relapse_session(user_id, last_session)
-        await finish_relapse_quiz(message)
-
+        await next_handler(message)
     else:
         await message.answer(RELAPSE_QUIZ_ERROR_MESSAGE)
         await start_relapse_quiz(message)

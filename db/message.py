@@ -43,7 +43,7 @@ def get_user_messages(user_id: int):
         session.close()
 
 
-def get_last_n_messages(user_id: int, n: int = 5):
+def get_last_n_messages(user_id: int, n: int = 6):
     session = SessionLocal()
     try:
         messages = (
