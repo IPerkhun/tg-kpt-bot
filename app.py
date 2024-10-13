@@ -118,7 +118,7 @@ async def cmd_relapse_warning(message: types.Message):
 
 
 @dp.message(
-    lambda message: get_last_relapse_session(message.from_user.id).get("current_step")
+    lambda message: get_last_relapse_session(message.from_user.id).current_step
     is not None
 )
 async def handle_relapse(message: types.Message):
