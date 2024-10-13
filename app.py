@@ -12,7 +12,7 @@ from db.data_manager import (
     get_last_relapse_session,
     get_last_start_quiz,
 )
-from db.pg_manager import test_db_connection
+from db.pg_manager import test_db_connection, create_tables
 
 from modules.base_handlers import handle_user_text, handle_user_voice
 from modules.note_manager import handle_notes_command
@@ -157,15 +157,16 @@ dp.include_router(router)
 
 
 async def main():
-
+    create_tables()  # Создание таблиц при старте
     start_scheduler()
     await set_bot_commands(bot)
-    await dp.start_polling(bot)
 
     try:
         test_db_connection()
     except Exception as e:
         logging.error(f"Database connection error: {e}")
+
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
