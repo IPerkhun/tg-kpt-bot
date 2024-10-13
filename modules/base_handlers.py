@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from aiogram import types, Bot
-from db.pg_manager import add_user_message, get_user_messages
+from db.message import add_user_message, get_last_n_messages
 from utils.transcribe import transcribe_audio
 from modules.gpt_therapist import GPTTherapist
 
@@ -9,24 +9,10 @@ logging.basicConfig(level=logging.DEBUG)
 gpt_therapist = GPTTherapist()
 
 
-def get_last_n_messages(user_id: int, n: int = 5) -> str:
-    """Получить последние N сообщений пользователя в формате контекста для GPT"""
-    last_messages = get_user_messages(user_id)[-n:]
-    context = "\n".join(
-        [
-            f"{msg.role}: {msg.content}"
-            for msg in last_messages
-            if msg.role in ["user", "bot"]
-        ]
-    )
-    return context
-
-
 async def handle_user_text(message: types.Message):
     user_id = message.from_user.id
     user_message = message.text
 
-    # Сохраняем текстовое сообщение пользователя в базу данных
     add_user_message(
         user_id,
         {
@@ -37,13 +23,9 @@ async def handle_user_text(message: types.Message):
         },
     )
 
-    # Получаем последние N сообщений для контекста
     context = get_last_n_messages(user_id, 5)
-
-    # Генерируем ответ от GPT
     reply = gpt_therapist.get_reply(f"{context}\nuser: {user_message}")
 
-    # Сохраняем ответ бота в базу данных
     add_user_message(
         user_id,
         {
@@ -54,7 +36,6 @@ async def handle_user_text(message: types.Message):
         },
     )
 
-    # Отправляем ответ пользователю
     await message.answer(reply)
 
 
@@ -74,7 +55,6 @@ async def handle_user_voice(message: types.Message, bot: Bot):
     # Транскрибируем голосовое сообщение в текст
     transcript_text = await transcribe_audio(local_file_path)
 
-    # Сохраняем транскрибированное голосовое сообщение в базу данных
     add_user_message(
         user_id,
         {
@@ -85,13 +65,9 @@ async def handle_user_voice(message: types.Message, bot: Bot):
         },
     )
 
-    # Получаем последние N сообщений для контекста
     context = get_last_n_messages(user_id, 5)
-
-    # Генерируем ответ от GPT
     reply = gpt_therapist.get_reply(f"{context}\nuser: {transcript_text}")
 
-    # Сохраняем ответ бота в базу данных
     add_user_message(
         user_id,
         {
@@ -102,5 +78,4 @@ async def handle_user_voice(message: types.Message, bot: Bot):
         },
     )
 
-    # Отправляем ответ пользователю
     await message.answer(reply)
