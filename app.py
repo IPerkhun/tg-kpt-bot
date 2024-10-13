@@ -99,7 +99,8 @@ async def cmd_start_quiz_callback(callback_query: types.CallbackQuery):
         and not message.text.startswith("/")
     )
     and (
-        get_last_start_quiz(message.from_user.id).current_step not in [None, "finished"]
+        (last_quiz := get_last_start_quiz(message.from_user.id)) is not None
+        and last_quiz.current_step not in [None, "finished"]
     )
 )
 async def handle_quiz(message: types.Message):
