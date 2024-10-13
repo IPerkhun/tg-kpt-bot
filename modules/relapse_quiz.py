@@ -260,8 +260,6 @@ async def finish_relapse_quiz(message: types.Message):
     last_session.current_step = None
     update_last_relapse_session(user_id, last_session)
 
-    response = GPTTherapist().get_help(last_session)
-
     await message.answer(
         RELAPSE_QUIZ_FINISH_MESSAGE,
         reply_markup=ReplyKeyboardRemove(),
@@ -270,15 +268,17 @@ async def finish_relapse_quiz(message: types.Message):
 
     text = (
         f"📝 *Твои ответы:*\n\n"
-        f"*Ситуация:* {last_session['situation']}\n"
-        f"*Мысли:* {last_session['thoughts']}\n"
-        f"*Эмоции:* {last_session['emotion_type']} (Оценка: {last_session['emotion_score']})\n"
-        f"*Физическое состояние:* {last_session['physical']}\n"
-        f"*Поведение:* {last_session['behavior']}\n"
+        f"*Ситуация:* {last_session.situation}\n"
+        f"*Мысли:* {last_session.thoughts}\n"
+        f"*Эмоции:* {last_session.emotion_type} (Оценка: {last_session.emotion_score})\n"
+        f"*Физическое состояние:* {last_session.physical}\n"
+        f"*Поведение:* {last_session.behavior}\n"
     )
 
+    response = GPTTherapist().get_help(text)
+
     await message.answer(text, parse_mode="Markdown")
-    # await asyncio.sleep(5)
+    # await asyncio.sleep(5)  # Убрал комментарий, можно добавить обратно если нужно
     await message.answer(response, parse_mode="Markdown")
 
 
