@@ -72,9 +72,10 @@ def get_last_relapse_session(user_id: int):
         session.close()
 
 
-def update_last_relapse_session(user_id: int, relapse_session: dict):
+def update_last_relapse_session(user_id: int, relapse_session: RelapseSession):
     session = SessionLocal()
     try:
+        # Получаем последнюю сессию пользователя
         last_session = (
             session.query(RelapseSession)
             .filter(RelapseSession.user_id == user_id)
@@ -82,20 +83,22 @@ def update_last_relapse_session(user_id: int, relapse_session: dict):
             .first()
         )
         if last_session:
-            last_session.current_step = relapse_session.get("current_step")
-            last_session.situation = relapse_session.get("situation")
-            last_session.thoughts = relapse_session.get("thoughts")
-            last_session.emotion_type = relapse_session.get("emotion_type")
-            last_session.emotion_score = relapse_session.get("emotion_score")
-            last_session.physical = relapse_session.get("physical")
-            last_session.behavior = relapse_session.get("behavior")
+            # Обновляем атрибуты сессии напрямую
+            last_session.current_step = relapse_session.current_step
+            last_session.situation = relapse_session.situation
+            last_session.thoughts = relapse_session.thoughts
+            last_session.emotion_type = relapse_session.emotion_type
+            last_session.emotion_score = relapse_session.emotion_score
+            last_session.physical = relapse_session.physical
+            last_session.behavior = relapse_session.behavior
 
-            # Преобразуем строку в объект datetime
-            timestamp = relapse_session.get("date_time")
+            # Если передана строковая дата, преобразуем ее в объект datetime
+            timestamp = relapse_session.timestamp
             if isinstance(timestamp, str):
                 timestamp = datetime.strptime(timestamp, "%d.%m.%Y %H:%M")
 
             last_session.timestamp = timestamp or datetime.now(timezone.utc)
+
             session.commit()
     finally:
         session.close()
