@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text
+from typing import List
 from datetime import datetime, timezone
 from db.base import Base, SessionLocal
 
@@ -32,11 +33,14 @@ def get_relapse_sessions(user_id: int):
 
 
 # Функция для обновления списка сессий рецидива пользователя
-def update_relapse_sessions(user_id: int, relapse_sessions: list):
+def add_new_relapse_session(user_id: int, relapse_session: dict):
     session = SessionLocal()
     try:
-        for relapse in relapse_sessions:
-            session.add(relapse)
+        relapse_session = RelapseSession(
+            user_id=user_id,
+            timestamp=relapse_session.get("date_time", datetime.now(timezone.utc)),
+        )
+        session.add(relapse_session)
         session.commit()
     finally:
         session.close()

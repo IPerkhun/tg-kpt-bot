@@ -13,12 +13,11 @@ from db.relapse import (
     timezone,
     get_last_relapse_session,
     update_last_relapse_session,
-    update_relapse_sessions,
+    add_new_relapse_session,
 )
 
 from datetime import datetime
 from modules.gpt_therapist import GPTTherapist
-from dataclasses import asdict
 from utils.content import (
     RELAPSE_QUIZ_START_MESSAGE,
     RELAPSE_QUIZ_SITUATION_PROMPT,
@@ -38,12 +37,10 @@ from utils.content import (
 
 async def start_relapse_quiz(message: types.Message):
     user_id = message.from_user.id
-    new_session = RelapseSession(
-        user_id=user_id,
-        timestamp=datetime.now(timezone.utc),  # Используем timestamp вместо date_time
-    )
-
-    update_relapse_sessions(user_id, [new_session])
+    new_session = {
+        "user_id": user_id,
+    }
+    add_new_relapse_session(user_id, new_session)
 
     await message.answer(
         RELAPSE_QUIZ_START_MESSAGE.format(
