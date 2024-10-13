@@ -9,10 +9,10 @@ from aiogram.types import BotCommand
 from dotenv import load_dotenv
 
 from db.data_manager import (
-    get_last_relapse_session,
     get_last_start_quiz,
 )
 from db.base import test_db_connection, create_tables
+from db.relapse import get_last_relapse_session
 
 from modules.base_handlers import handle_user_text, handle_user_voice
 from modules.note_manager import handle_notes_command
@@ -138,13 +138,10 @@ async def stop_smoking_handler(message: types.Message):
 )
 async def handle_message(message: types.Message):
     user_id = message.from_user.id
-    logging.debug(
-        f"User ID: {user_id}, current_function: {sys._getframe().f_code.co_name}"
-    )
 
-    if get_last_start_quiz(user_id).get("current_step") is None:
+    if get_last_start_quiz(user_id).current_step is None:
         await handle_user_text(message)
-    elif get_last_relapse_session(user_id).get("current_step") is None:
+    elif get_last_relapse_session(user_id).current_step is None:
         await handle_user_text(message)
 
 
