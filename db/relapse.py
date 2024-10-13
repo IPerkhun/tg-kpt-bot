@@ -36,23 +36,7 @@ def update_relapse_sessions(user_id: int, relapse_sessions: list):
     session = SessionLocal()
     try:
         for relapse in relapse_sessions:
-            # Преобразуем строку в объект datetime
-            timestamp = relapse.get("date_time")
-            if isinstance(timestamp, str):
-                timestamp = datetime.strptime(timestamp, "%d.%m.%Y %H:%M")
-
-            new_session = RelapseSession(
-                user_id=user_id,
-                current_step=relapse.get("current_step"),
-                situation=relapse.get("situation"),
-                thoughts=relapse.get("thoughts"),
-                emotion_type=relapse.get("emotion_type"),
-                emotion_score=relapse.get("emotion_score"),
-                physical=relapse.get("physical"),
-                behavior=relapse.get("behavior"),
-                timestamp=timestamp or datetime.now(timezone.utc),
-            )
-            session.add(new_session)
+            session.add(relapse)
         session.commit()
     finally:
         session.close()
@@ -72,44 +56,23 @@ def get_last_relapse_session(user_id: int):
         session.close()
 
 
+# Обновление последней сессии рецидива пользователя
 def update_last_relapse_session(user_id: int, relapse_session: RelapseSession):
     session = SessionLocal()
     try:
-        # Получаем последнюю сессию пользователя
-        last_session = (
-            session.query(RelapseSession)
-            .filter(RelapseSession.user_id == user_id)
-            .order_by(RelapseSession.timestamp.desc())
-            .first()
-        )
-        if last_session:
-            # Обновляем атрибуты сессии напрямую
-            last_session.current_step = relapse_session.current_step
-            last_session.situation = relapse_session.situation
-            last_session.thoughts = relapse_session.thoughts
-            last_session.emotion_type = relapse_session.emotion_type
-            last_session.emotion_score = relapse_session.emotion_score
-            last_session.physical = relapse_session.physical
-            last_session.behavior = relapse_session.behavior
-
-            # Если передана строковая дата, преобразуем ее в объект datetime
-            timestamp = relapse_session.timestamp
-            if isinstance(timestamp, str):
-                timestamp = datetime.strptime(timestamp, "%d.%m.%Y %H:%M")
-
-            last_session.timestamp = timestamp or datetime.now(timezone.utc)
-
-            session.commit()
+        relapse_session.user_id = user_id
+        session.add(relapse_session)
+        session.commit()
     finally:
         session.close()
 
 
 def get_all_notes(user_id: int):
-    session = SessionLocal()
+    sess = SessionLocal()
     try:
         # Получаем все сессии рецидива для данного пользователя
         sessions = (
-            session.query(RelapseSession)
+            sess.query(RelapseSession)
             .filter(RelapseSession.user_id == user_id)
             .order_by(RelapseSession.timestamp.desc())
             .all()
@@ -120,18 +83,16 @@ def get_all_notes(user_id: int):
 
         # Формируем текст с заметками
         notes_text = ""
-        for idx, session in enumerate(sessions, 1):
+        for idx, s in enumerate(sessions, 1):
             notes_text += f"📄 *Заметка {idx}*\n"
-            notes_text += f"🗓 *Дата*: {session.timestamp.strftime('%Y-%m-%d %H:%M') if session.timestamp else 'Не указана'}\n"
-            notes_text += f"📍 *Ситуация*: {session.situation or 'Не указана'}\n"
-            notes_text += f"💭 *Мысли*: {session.thoughts or 'Не указаны'}\n"
-            notes_text += f"😶‍🌫️ *Эмоции*: {session.emotion_type or 'Не указаны'} (Оценка: {session.emotion_score or 'Не указана'})\n"
-            notes_text += (
-                f"💪 *Физическое состояние*: {session.physical or 'Не указано'}\n"
-            )
-            notes_text += f"🎯 *Поведение*: {session.behavior or 'Не указано'}\n"
+            notes_text += f"🗓 *Дата*: {s.timestamp.strftime('%Y-%m-%d %H:%M') if s.timestamp else 'Не указана'}\n"
+            notes_text += f"📍 *Ситуация*: {s.situation or 'Не указана'}\n"
+            notes_text += f"💭 *Мысли*: {s.thoughts or 'Не указаны'}\n"
+            notes_text += f"😶‍🌫️ *Эмоции*: {s.emotion_type or 'Не указаны'} (Оценка: {s.emotion_score or 'Не указана'})\n"
+            notes_text += f"💪 *Физическое состояние*: {s.physical or 'Не указано'}\n"
+            notes_text += f"🎯 *Поведение*: {s.behavior or 'Не указано'}\n"
             notes_text += f"{'-'*30}\n\n"
 
         return notes_text
     finally:
-        session.close()
+        sess.close()

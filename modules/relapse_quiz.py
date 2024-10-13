@@ -10,13 +10,13 @@ from aiogram.types import (
 
 # from db.data_manager import get_user_data, update_user_data, get_last_relapse_session
 from db.relapse import (
+    RelapseSession,
     get_last_relapse_session,
     update_last_relapse_session,
     update_relapse_sessions,
 )
 
 from datetime import datetime
-from utils.data_models import RelapseSession
 from modules.gpt_therapist import GPTTherapist
 from dataclasses import asdict
 from utils.content import (
@@ -38,21 +38,16 @@ from utils.content import (
 
 async def start_relapse_quiz(message: types.Message):
     user_id = message.from_user.id
-    new_session = {
-        "current_step": None,
-        "situation": None,
-        "thoughts": None,
-        "emotion_type": None,
-        "emotion_score": None,
-        "physical": None,
-        "behavior": None,
-        "date_time": datetime.now().strftime("%d.%m.%Y %H:%M"),
-    }
+    new_session = RelapseSession(
+        timestamp=datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
+    )
 
     update_relapse_sessions(user_id, [new_session])
 
     await message.answer(
-        RELAPSE_QUIZ_START_MESSAGE.format(date_time=new_session["date_time"]),
+        RELAPSE_QUIZ_START_MESSAGE.format(
+            date_time=new_session.timestamp.strftime("%d.%m.%Y %H:%M:%S")
+        ),
         reply_markup=ReplyKeyboardRemove(),
     )
 
