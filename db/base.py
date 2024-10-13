@@ -1,12 +1,11 @@
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import logging
 
 load_dotenv()
-
 
 DATABASE_URL = (
     f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@"
@@ -16,7 +15,6 @@ logging.info(f"Connecting to the database at {DATABASE_URL}")
 
 engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 
 Base = declarative_base()
 
@@ -36,7 +34,7 @@ def get_db_session():
 def test_db_connection():
     session = SessionLocal()
     try:
-        session.execute("SELECT 1")
+        session.execute(text("SELECT 1"))
         print("Database connection successful.")
     except Exception as e:
         print(f"Error connecting to the database: {e}")

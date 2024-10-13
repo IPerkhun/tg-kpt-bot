@@ -278,7 +278,7 @@ async def finish_relapse_quiz(message: types.Message):
     )
 
     await message.answer(text, parse_mode="Markdown")
-    await asyncio.sleep(5)
+    # await asyncio.sleep(5)
     await message.answer(response, parse_mode="Markdown")
 
 
