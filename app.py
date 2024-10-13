@@ -12,7 +12,7 @@ from db.data_manager import (
     get_last_relapse_session,
     get_last_start_quiz,
 )
-from db.pg_manager import test_db_connection, create_tables
+from db.base import test_db_connection, create_tables
 
 from modules.base_handlers import handle_user_text, handle_user_voice
 from modules.note_manager import handle_notes_command
