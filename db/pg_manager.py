@@ -16,7 +16,7 @@ DATABASE_URL = (
     f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@"
     f"{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
 )
-
+logging.info(f"Connecting to the database at {DATABASE_URL}")
 engine = create_engine(
     DATABASE_URL, echo=False
 )  # echo=False для отключения логирования SQL-запросов
