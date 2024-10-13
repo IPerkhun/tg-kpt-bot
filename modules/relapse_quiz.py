@@ -41,10 +41,10 @@ async def start_relapse_quiz(message: types.Message):
         "user_id": user_id,
     }
     add_new_relapse_session(user_id, new_session)
-
+    last_session = get_last_relapse_session(user_id)
     await message.answer(
         RELAPSE_QUIZ_START_MESSAGE.format(
-            date_time=new_session.timestamp.strftime("%d.%m.%Y %H:%M:%S")
+            date_time=last_session.timestamp.strftime("%d.%m.%Y %H:%M:%S")
         ),
         reply_markup=ReplyKeyboardRemove(),
     )
