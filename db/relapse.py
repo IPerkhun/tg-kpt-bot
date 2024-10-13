@@ -36,6 +36,11 @@ def update_relapse_sessions(user_id: int, relapse_sessions: list):
     session = SessionLocal()
     try:
         for relapse in relapse_sessions:
+            # Преобразуем строку в объект datetime
+            timestamp = relapse.get("date_time")
+            if isinstance(timestamp, str):
+                timestamp = datetime.strptime(timestamp, "%d.%m.%Y %H:%M")
+
             new_session = RelapseSession(
                 user_id=user_id,
                 current_step=relapse.get("current_step"),
@@ -45,7 +50,7 @@ def update_relapse_sessions(user_id: int, relapse_sessions: list):
                 emotion_score=relapse.get("emotion_score"),
                 physical=relapse.get("physical"),
                 behavior=relapse.get("behavior"),
-                timestamp=relapse.get("date_time", datetime.now(timezone.utc)),
+                timestamp=timestamp or datetime.now(timezone.utc),
             )
             session.add(new_session)
         session.commit()
@@ -84,9 +89,13 @@ def update_last_relapse_session(user_id: int, relapse_session: dict):
             last_session.emotion_score = relapse_session.get("emotion_score")
             last_session.physical = relapse_session.get("physical")
             last_session.behavior = relapse_session.get("behavior")
-            last_session.timestamp = relapse_session.get(
-                "date_time", datetime.now(timezone.utc)
-            )
+
+            # Преобразуем строку в объект datetime
+            timestamp = relapse_session.get("date_time")
+            if isinstance(timestamp, str):
+                timestamp = datetime.strptime(timestamp, "%d.%m.%Y %H:%M")
+
+            last_session.timestamp = timestamp or datetime.now(timezone.utc)
             session.commit()
     finally:
         session.close()
