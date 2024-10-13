@@ -29,24 +29,11 @@ def get_last_start_quiz(user_id: int):
 
 
 # Обновление последнего квиза пользователя
-def update_last_start_quiz(
-    user_id: int, smoking_type: str = None, current_step: str = None
-):
+def update_last_start_quiz(last_quiz: StartQuiz):
     session = SessionLocal()
     try:
-        last_quiz = (
-            session.query(StartQuiz)
-            .filter(StartQuiz.user_id == user_id)
-            .order_by(StartQuiz.timestamp.desc())
-            .first()
-        )
-        if last_quiz:
-            if smoking_type is not None:
-                last_quiz.smoking_type = smoking_type
-            if current_step is not None:
-                last_quiz.current_step = current_step
-            session.commit()
-        return last_quiz
+        session.add(last_quiz)
+        session.commit()
     finally:
         session.close()
 
