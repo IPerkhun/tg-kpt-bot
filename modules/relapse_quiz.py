@@ -62,7 +62,7 @@ async def start_relapse_quiz(message: types.Message):
 async def ask_situation(message: types.Message):
     user_id = message.from_user.id
     last_session = get_last_relapse_session(user_id)
-    last_session["current_step"] = "relapse_situation"
+    last_session.current_step = "relapse_situation"
     update_last_relapse_session(user_id, last_session)
 
     keyboard = ReplyKeyboardMarkup(
