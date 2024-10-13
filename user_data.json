@@ -1,3 +1,50 @@
 {
-    
+    "67306629": {
+        "relapse_sessions": [],
+        "voices": [],
+        "start_quizes": [],
+        "stop_smoking_data": {},
+        "messages": [
+            {
+                "type": "text",
+                "content": "привет",
+                "timestamp": "2024-10-11 15:34:26",
+                "role": "user"
+            },
+            {
+                "type": "text",
+                "content": "Привет! Как твои дела? 😊",
+                "timestamp": "2024-10-11 15:34:27",
+                "role": "bot"
+            }
+        ]
+    },
+    "435676911": {
+        "relapse_sessions": [],
+        "voices": [],
+        "start_quizes": [],
+        "stop_smoking_data": {
+            "time": "2024-10-11 16:35:12",
+            "jobs": [
+                "7b8e56215bc546e78bf9fd04fdf3a0aa",
+                "979edf9c07dc49668850a0687b69a389",
+                "79683634c15f4483b4de92774a94d167",
+                "923cfb20bab04f6ba19b5cd8fd2bf1fa",
+                "e86d6abc64444319bc691b4bd9ca3fab",
+                "eb301a59c9cc46fb9b5a15b4ef09dbbc",
+                "07c281ed35b444f7973a1331c5a1aeb2",
+                "f3fa3025b49546e9b293bacce8f98040",
+                "c0fd9fe7c7e949d084128e455396a9bf",
+                "b29cdf6d8e944ab49f67f4707fadcdd0",
+                "609e2317ebf1468f89a5346db8f53b35",
+                "4cd6829c50804265bd65560606f4335f"
+            ]
+        }
+    },
+    "61350155": {
+        "relapse_sessions": [],
+        "voices": [],
+        "start_quizes": [],
+        "stop_smoking_data": {}
+    }
 }

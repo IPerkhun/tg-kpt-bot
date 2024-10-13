@@ -4,3 +4,5 @@ aiogram
 python-dotenv
 openai
 apscheduler
+sqlalchemy
+psycopg2-binary
