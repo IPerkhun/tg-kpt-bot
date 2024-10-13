@@ -8,11 +8,12 @@ from aiogram.filters import Command
 from aiogram.types import BotCommand
 from dotenv import load_dotenv
 
-from db.data_manager import (
-    get_last_start_quiz,
-)
+# from db.data_manager import (
+#     get_last_start_quiz,
+# )
 from db.base import test_db_connection, create_tables
 from db.relapse import get_last_relapse_session
+from db.start_quiz import get_last_start_quiz
 
 from modules.base_handlers import handle_user_text, handle_user_voice
 from modules.note_manager import handle_notes_command
@@ -154,7 +155,7 @@ dp.include_router(router)
 
 
 async def main():
-    create_tables()  # Создание таблиц при старте
+    create_tables()
     start_scheduler()
     await set_bot_commands(bot)
 

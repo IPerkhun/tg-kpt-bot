@@ -1,10 +1,9 @@
 from aiogram import types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from db.data_manager import (
+from db.start_quiz import (
     get_last_start_quiz,
     update_last_start_quiz,
-    get_user_data,
-    update_user_data,
+    add_new_start_quiz,
 )
 from utils.content import (
     WELCOME_MESSAGE,
@@ -17,23 +16,16 @@ from utils.content import (
     CUSTOM_REASON_PROMPT,
     FINISH_QUIZ_MESSAGE,
 )
-from utils.data_models import StartQuiz
 
 
 # Старт квиза и добавление пустой записи в start_quizes
 async def start_quiz(message: types.Message, user_id: int = None):
     if user_id is None:
         user_id = message.from_user.id
-    else:
-        user_id = user_id
 
     # Добавляем новый пустой квиз
-    new_quiz = StartQuiz().to_dict()
-    new_quiz["current_step"] = "step1"
-    user_data = get_user_data(user_id)
-    user_data["start_quizes"].append(new_quiz)
-    update_user_data(user_id, user_data)
-    print(get_user_data(user_id).get("start_quizes")[-1].get("current_step"))
+    new_quiz = add_new_start_quiz(user_id)
+
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Сигареты")],
@@ -51,8 +43,9 @@ async def handle_quiz_step1(message: types.Message):
     user_id = message.from_user.id
     last_quiz = get_last_start_quiz(user_id)
 
-    last_quiz["smoking_type"] = message.text
-    last_quiz["current_step"] = "step2"
+    # Обновляем данные о квизе
+    last_quiz.smoking_type = message.text
+    last_quiz.current_step = "step2"
     update_last_start_quiz(user_id, last_quiz)
 
     if message.text == "Сигареты":
@@ -111,8 +104,9 @@ async def handle_quiz_step2(message: types.Message):
     user_id = message.from_user.id
     last_quiz = get_last_start_quiz(user_id)
 
-    last_quiz["intensity"] = message.text
-    last_quiz["current_step"] = "step3"
+    # Обновляем данные о квизе
+    last_quiz.intensity = message.text
+    last_quiz.current_step = "step3"
     update_last_start_quiz(user_id, last_quiz)
 
     keyboard = ReplyKeyboardMarkup(
@@ -131,8 +125,10 @@ async def handle_quiz_step2(message: types.Message):
 async def handle_quiz_step3(message: types.Message):
     user_id = message.from_user.id
     last_quiz = get_last_start_quiz(user_id)
-    last_quiz["period"] = message.text
-    last_quiz["current_step"] = "step4"
+
+    # Обновляем данные о квизе
+    last_quiz.period = message.text
+    last_quiz.current_step = "step4"
     update_last_start_quiz(user_id, last_quiz)
 
     keyboard = ReplyKeyboardMarkup(
@@ -153,11 +149,12 @@ async def handle_quiz_step4(message: types.Message):
     last_quiz = get_last_start_quiz(user_id)
 
     if message.text == "Свой вариант ✍️":
-        last_quiz["current_step"] = "custom_reason_start_quiz"
+        last_quiz.current_step = "custom_reason_start_quiz"
+        update_last_start_quiz(user_id, last_quiz)
         await message.answer(CUSTOM_REASON_PROMPT, reply_markup=ReplyKeyboardRemove())
     else:
-        last_quiz["reason"] = message.text
-        last_quiz["current_step"] = "finished"
+        last_quiz.reason = message.text
+        last_quiz.current_step = "finished"
         update_last_start_quiz(user_id, last_quiz)
         await finish_quiz(message)
 
@@ -166,7 +163,9 @@ async def handle_quiz_step4(message: types.Message):
 async def handle_custom_reason(message: types.Message):
     user_id = message.from_user.id
     last_quiz = get_last_start_quiz(user_id)
-    last_quiz["reason"] = message.text
+
+    last_quiz.reason = message.text
+    last_quiz.current_step = "finished"
     update_last_start_quiz(user_id, last_quiz)
     await finish_quiz(message)
 
@@ -175,7 +174,8 @@ async def handle_custom_reason(message: types.Message):
 async def finish_quiz(message: types.Message):
     user_id = message.from_user.id
     last_quiz = get_last_start_quiz(user_id)
-    last_quiz["current_step"] = "finished"
+
+    last_quiz.current_step = "finished"
     update_last_start_quiz(user_id, last_quiz)
 
     await message.answer(
@@ -195,10 +195,23 @@ quiz_step_handlers = {
 # Универсальная функция для обработки шагов квиза
 async def handle_quiz_step(message: types.Message):
     user_id = message.from_user.id
-    current_step = get_last_start_quiz(user_id).get("current_step")
+    last_quiz = get_last_start_quiz(user_id)
+    current_step = last_quiz.current_step
 
     if current_step in quiz_step_handlers:
         # Вызов соответствующего обработчика шага
         await quiz_step_handlers[current_step](message)
     else:
         await message.answer("Неизвестный шаг квиза.")
+
+
+# # Универсальная функция для обработки шагов квиза
+# async def handle_quiz_step(message: types.Message):
+#     user_id = message.from_user.id
+#     current_step = get_last_start_quiz(user_id).get("current_step")
+
+#     if current_step in quiz_step_handlers:
+#         # Вызов соответствующего обработчика шага
+#         await quiz_step_handlers[current_step](message)
+#     else:
+#         await message.answer("Неизвестный шаг квиза.")
