@@ -39,7 +39,8 @@ from utils.content import (
 async def start_relapse_quiz(message: types.Message):
     user_id = message.from_user.id
     new_session = RelapseSession(
-        timestamp=datetime.now(timezone.utc)  # Используем timestamp вместо date_time
+        user_id=user_id,
+        timestamp=datetime.now(timezone.utc),  # Используем timestamp вместо date_time
     )
 
     update_relapse_sessions(user_id, [new_session])
