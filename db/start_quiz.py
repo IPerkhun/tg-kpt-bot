@@ -29,7 +29,7 @@ def get_last_start_quiz(user_id: int):
 
 
 # Обновление последнего квиза пользователя
-def update_last_start_quiz(last_quiz: StartQuiz):
+def update_last_start_quiz(user_id, last_quiz: StartQuiz):
     session = SessionLocal()
     try:
         session.add(last_quiz)

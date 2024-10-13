@@ -90,20 +90,6 @@ async def cmd_start_quiz_callback(callback_query: types.CallbackQuery):
     await start_quiz_handler(callback_query.message, callback_query.from_user.id)
 
 
-@dp.message(
-    lambda message: (
-        message.content_type == types.ContentType.TEXT
-        and not message.text.startswith("/")
-    )
-    and (
-        (last_quiz := get_last_start_quiz(message.from_user.id)) is not None
-        and last_quiz.current_step not in [None, "finished"]
-    )
-)
-async def handle_quiz(message: types.Message):
-    await handle_quiz_step(message)
-
-
 @dp.message(Command("notes"))
 async def cmd_notes(message: types.Message):
     await handle_notes_command(message)  # Используем обработчик из note_manager
@@ -115,21 +101,36 @@ async def cmd_relapse_warning(message: types.Message):
     await start_relapse_quiz(message)
 
 
-@dp.message(
-    lambda message: get_last_relapse_session(message.from_user.id).current_step
-    is not None
-)
-async def handle_relapse(message: types.Message):
-    await handle_relapse_step(message, bot)
-
-
 # Обработчик для команды /stop_smoking
 @dp.message(Command("stop_smoking"))
 async def stop_smoking_handler(message: types.Message):
     await cmd_stop_smoking(message, bot)
 
 
+# @dp.message(
+#     lambda message: get_last_relapse_session(message.from_user.id).current_step
+#     is not None
+# )
+# async def handle_relapse(message: types.Message):
+#     await handle_relapse_step(message, bot)
+
+
+# @dp.message(
+#     lambda message: (
+#         message.content_type == types.ContentType.TEXT
+#         and not message.text.startswith("/")
+#     )
+#     and (
+#         (last_quiz := get_last_start_quiz(message.from_user.id)) is not None
+#         and last_quiz.current_step not in [None, "finished"]
+#     )
+# )
+# async def handle_quiz(message: types.Message):
+#     await handle_quiz_step(message)
+
+
 # Обработчики для текстовых и голосовых сообщений
+# Проверка на активность сессии рецидива или квиза
 @dp.message(
     lambda message: message.content_type == types.ContentType.TEXT
     and not message.text.startswith("/")
@@ -137,15 +138,21 @@ async def stop_smoking_handler(message: types.Message):
 async def handle_message(message: types.Message):
     user_id = message.from_user.id
 
+    # Получаем последнюю сессию рецидива и квиз
     last_quiz = get_last_start_quiz(user_id)
     last_relapse = get_last_relapse_session(user_id)
 
-    if last_quiz is None or last_quiz.current_step is None:
-        await handle_user_text(message)
-    elif last_relapse is None or last_relapse.current_step is None:
+    # Проверка активности квиза или сессии рецидива
+    if last_quiz and last_quiz.current_step not in [None, "finished"]:
+        await handle_quiz_step(message)
+    elif last_relapse and last_relapse.current_step is not None:
+        await handle_relapse_step(message, bot)
+    else:
+        # Если квиза и сессии рецидива нет, обрабатываем как обычное сообщение
         await handle_user_text(message)
 
 
+# Обработчик для голосовых сообщений
 @dp.message(lambda message: message.content_type == types.ContentType.VOICE)
 async def handle_voice_message(message: types.Message):
     await handle_user_voice(message, bot)

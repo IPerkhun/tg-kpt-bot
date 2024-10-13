@@ -67,7 +67,7 @@ def get_last_relapse_session(user_id: int):
             .order_by(RelapseSession.timestamp.desc())
             .first()
         )
-        return last_session if last_session else {"current_step": None}
+        return last_session
     finally:
         session.close()
 
