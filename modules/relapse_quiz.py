@@ -1,5 +1,4 @@
 from aiogram import types
-import asyncio
 from aiogram import types, Bot
 from aiogram.types import (
     ContentType,
@@ -11,6 +10,7 @@ from aiogram.types import (
 # from db.data_manager import get_user_data, update_user_data, get_last_relapse_session
 from db.relapse import (
     RelapseSession,
+    timezone,
     get_last_relapse_session,
     update_last_relapse_session,
     update_relapse_sessions,
@@ -39,7 +39,7 @@ from utils.content import (
 async def start_relapse_quiz(message: types.Message):
     user_id = message.from_user.id
     new_session = RelapseSession(
-        timestamp=datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
+        timestamp=datetime.now(timezone.utc)  # Используем timestamp вместо date_time
     )
 
     update_relapse_sessions(user_id, [new_session])
