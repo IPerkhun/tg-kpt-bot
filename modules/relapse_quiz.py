@@ -249,9 +249,28 @@ async def handle_relapse_behavior(message: types.Message):
 
 async def finish_relapse_quiz(message: types.Message):
     user_id = message.from_user.id
+
+    # Получаем сессию рецидива и все необходимые атрибуты до закрытия сессии
     last_session = get_last_relapse_session(user_id)
+
+    situation = last_session.situation
+    thoughts = last_session.thoughts
+    emotion_type = last_session.emotion_type
+    emotion_score = last_session.emotion_score
+    physical = last_session.physical
+    behavior = last_session.behavior
+
     last_session.current_step = None
     update_last_relapse_session(user_id, last_session)
+
+    text = (
+        f"📝 *Твои ответы:*\n\n"
+        f"*Ситуация:* {situation}\n"
+        f"*Мысли:* {thoughts}\n"
+        f"*Эмоции:* {emotion_type} (Оценка: {emotion_score})\n"
+        f"*Физическое состояние:* {physical}\n"
+        f"*Поведение:* {behavior}\n"
+    )
 
     await message.answer(
         RELAPSE_QUIZ_FINISH_MESSAGE,
@@ -259,19 +278,8 @@ async def finish_relapse_quiz(message: types.Message):
         parse_mode="Markdown",
     )
 
-    text = (
-        f"📝 *Твои ответы:*\n\n"
-        f"*Ситуация:* {last_session.situation}\n"
-        f"*Мысли:* {last_session.thoughts}\n"
-        f"*Эмоции:* {last_session.emotion_type} (Оценка: {last_session.emotion_score})\n"
-        f"*Физическое состояние:* {last_session.physical}\n"
-        f"*Поведение:* {last_session.behavior}\n"
-    )
-
     response = GPTTherapist().get_help(text)
-
     await message.answer(text, parse_mode="Markdown")
-    # await asyncio.sleep(5)  # Убрал комментарий, можно добавить обратно если нужно
     await message.answer(response, parse_mode="Markdown")
 
 
