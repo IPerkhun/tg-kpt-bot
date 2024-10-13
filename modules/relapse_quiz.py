@@ -7,7 +7,14 @@ from aiogram.types import (
     KeyboardButton,
     ReplyKeyboardRemove,
 )
-from db.data_manager import get_user_data, update_user_data, get_last_relapse_session
+
+# from db.data_manager import get_user_data, update_user_data, get_last_relapse_session
+from db.relapse import (
+    get_last_relapse_session,
+    update_last_relapse_session,
+    update_relapse_sessions,
+)
+
 from datetime import datetime
 from utils.data_models import RelapseSession
 from modules.gpt_therapist import GPTTherapist
@@ -31,16 +38,18 @@ from utils.content import (
 
 async def start_relapse_quiz(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
+    new_session = {
+        "current_step": None,
+        "situation": None,
+        "thoughts": None,
+        "emotion_type": None,
+        "emotion_score": None,
+        "physical": None,
+        "behavior": None,
+        "date_time": datetime.now().strftime("%d.%m.%Y %H:%M"),
+    }
 
-    # Создаем новую сессию
-    new_session = RelapseSession(date_time=datetime.now().strftime("%d.%m.%Y %H:%M"))
-
-    if "relapse_sessions" not in user_data:
-        user_data["relapse_sessions"] = []
-
-    user_data["relapse_sessions"].append(asdict(new_session))
-    update_user_data(user_id, user_data)
+    update_relapse_sessions(user_id, [new_session])
 
     await message.answer(
         RELAPSE_QUIZ_START_MESSAGE.format(date_time=new_session.date_time),
@@ -52,11 +61,9 @@ async def start_relapse_quiz(message: types.Message):
 
 async def ask_situation(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
-    current_session["current_step"] = "relapse_situation"
-
-    update_user_data(user_id, user_data)
+    last_session = get_last_relapse_session(user_id)
+    last_session["current_step"] = "relapse_situation"
+    update_last_relapse_session(user_id, last_session)
 
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -72,19 +79,18 @@ async def ask_situation(message: types.Message):
 
 async def handle_relapse_situation(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
+    last_session = get_last_relapse_session(user_id)
 
     if message.text == "Свой вариант":
-        current_session["current_step"] = "relapse_custom_situation"
-        update_user_data(user_id, user_data)
+        last_session["current_step"] = "relapse_custom_situation"
+        update_last_relapse_session(user_id, last_session)
         await message.answer(
             RELAPSE_QUIZ_CUSTOM_SITUATION_PROMPT, reply_markup=ReplyKeyboardRemove()
         )
     else:
-        current_session["situation"] = message.text
-        current_session["current_step"] = "relapse_thoughts"
-        update_user_data(user_id, user_data)
+        last_session["situation"] = message.text
+        last_session["current_step"] = "relapse_thoughts"
+        update_last_relapse_session(user_id, last_session)
         await ask_thoughts(message)
 
 
@@ -107,19 +113,18 @@ async def ask_thoughts(message: types.Message):
 
 async def handle_relapse_thoughts(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
+    last_session = get_last_relapse_session(user_id)
 
     if message.text == "Свой вариант":
-        current_session["current_step"] = "relapse_custom_thoughts"
-        update_user_data(user_id, user_data)
+        last_session["current_step"] = "relapse_custom_thoughts"
+        update_last_relapse_session(user_id, last_session)
         await message.answer(
             RELAPSE_QUIZ_CUSTOM_THOUGHTS_PROMPT, reply_markup=ReplyKeyboardRemove()
         )
     else:
-        current_session["thoughts"] = message.text
-        current_session["current_step"] = "relapse_emotions"
-        update_user_data(user_id, user_data)
+        last_session["thoughts"] = message.text
+        last_session["current_step"] = "relapse_emotions"
+        update_last_relapse_session(user_id, last_session)
         await ask_emotions(message)
 
 
@@ -138,12 +143,10 @@ async def ask_emotions(message: types.Message):
 
 async def handle_relapse_emotions(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
-    current_session["emotion_type"] = message.text
-
-    current_session["current_step"] = "relapse_emotion_score"
-    update_user_data(user_id, user_data)
+    last_session = get_last_relapse_session(user_id)
+    last_session["emotion_type"] = message.text
+    last_session["current_step"] = "relapse_emotion_score"
+    update_last_relapse_session(user_id, last_session)
 
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -165,8 +168,7 @@ async def handle_relapse_emotions(message: types.Message):
 
 async def handle_relapse_emotion_score(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
+    last_session = get_last_relapse_session(user_id)
 
     try:
         emotion_score = int(message.text)
@@ -176,10 +178,9 @@ async def handle_relapse_emotion_score(message: types.Message):
         await message.answer("Пожалуйста, выберите оценку от 1 до 5.")
         return
 
-    current_session["emotion_score"] = emotion_score
-
-    current_session["current_step"] = "relapse_physical"
-    update_user_data(user_id, user_data)
+    last_session["emotion_score"] = emotion_score
+    last_session["current_step"] = "relapse_physical"
+    update_last_relapse_session(user_id, last_session)
     await ask_physical(message)
 
 
@@ -196,31 +197,30 @@ async def ask_physical(message: types.Message):
     await message.answer(RELAPSE_QUIZ_PHYSICAL_PROMPT, reply_markup=keyboard)
 
 
-async def handle_relapse_physical(message: types.Message, bot):
+async def handle_relapse_physical(message: types.Message, bot: Bot):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
+    last_session = get_last_relapse_session(user_id)
 
     if message.content_type == ContentType.VOICE:
         voice_message_id = message.voice.file_id
-        current_session["physical"] = f"Голосовое сообщение: {voice_message_id}"
+        last_session["physical"] = f"Голосовое сообщение: {voice_message_id}"
         file = await bot.get_file(voice_message_id)
-        current_session["voice_message"] = file.file_path
-        current_session["current_step"] = "relapse_behavior"
-        update_user_data(user_id, user_data)
+        last_session["voice_message"] = file.file_path
+        last_session["current_step"] = "relapse_behavior"
+        update_last_relapse_session(user_id, last_session)
         await ask_behavior(message)
         return
 
     if message.text == "Другое":
-        current_session["current_step"] = "relapse_custom_physical"
-        update_user_data(user_id, user_data)
+        last_session["current_step"] = "relapse_custom_physical"
+        update_last_relapse_session(user_id, last_session)
         await message.answer(
             RELAPSE_QUIZ_CUSTOM_PHYSICAL_PROMPT, reply_markup=ReplyKeyboardRemove()
         )
     else:
-        current_session["physical"] = message.text
-        current_session["current_step"] = "relapse_behavior"
-        update_user_data(user_id, user_data)
+        last_session["physical"] = message.text
+        last_session["current_step"] = "relapse_behavior"
+        update_last_relapse_session(user_id, last_session)
         await ask_behavior(message)
 
 
@@ -239,30 +239,28 @@ async def ask_behavior(message: types.Message):
 
 async def handle_relapse_behavior(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
+    last_session = get_last_relapse_session(user_id)
 
     if message.text == "Другое":
-        current_session["current_step"] = "relapse_custom_behavior"
-        update_user_data(user_id, user_data)
+        last_session["current_step"] = "relapse_custom_behavior"
+        update_last_relapse_session(user_id, last_session)
         await message.answer(
             RELAPSE_QUIZ_CUSTOM_BEHAVIOR_PROMPT, reply_markup=ReplyKeyboardRemove()
         )
     else:
-        current_session["behavior"] = message.text
-        current_session["current_step"] = "relapse_done"
-        update_user_data(user_id, user_data)
+        last_session["behavior"] = message.text
+        last_session["current_step"] = "relapse_done"
+        update_last_relapse_session(user_id, last_session)
         await finish_relapse_quiz(message)
 
 
 async def finish_relapse_quiz(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
-    current_session["current_step"] = None
-    update_user_data(user_id, user_data)
+    last_session = get_last_relapse_session(user_id)
+    last_session["current_step"] = None
+    update_last_relapse_session(user_id, last_session)
 
-    response = GPTTherapist().get_help(user_data["relapse_sessions"][:-1])
+    response = GPTTherapist().get_help(last_session)
 
     await message.answer(
         RELAPSE_QUIZ_FINISH_MESSAGE,
@@ -272,11 +270,11 @@ async def finish_relapse_quiz(message: types.Message):
 
     text = (
         f"📝 *Твои ответы:*\n\n"
-        f"*Ситуация:* {current_session['situation']}\n"
-        f"*Мысли:* {current_session['thoughts']}\n"
-        f"*Эмоции:* {current_session['emotion_type']} (Оценка: {current_session['emotion_score']})\n"
-        f"*Физическое состояние:* {current_session['physical']}\n"
-        f"*Поведение:* {current_session['behavior']}\n"
+        f"*Ситуация:* {last_session['situation']}\n"
+        f"*Мысли:* {last_session['thoughts']}\n"
+        f"*Эмоции:* {last_session['emotion_type']} (Оценка: {last_session['emotion_score']})\n"
+        f"*Физическое состояние:* {last_session['physical']}\n"
+        f"*Поведение:* {last_session['behavior']}\n"
     )
 
     await message.answer(text, parse_mode="Markdown")
@@ -286,32 +284,31 @@ async def finish_relapse_quiz(message: types.Message):
 
 async def handle_relapse_custom_message(message: types.Message):
     user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    current_session = user_data["relapse_sessions"][-1]
-    current_step = current_session["current_step"]
+    last_session = get_last_relapse_session(user_id)
+    current_step = last_session["current_step"]
 
     if current_step == "relapse_custom_situation":
-        current_session["situation"] = message.text
-        current_session["current_step"] = "relapse_thoughts"
-        update_user_data(user_id, user_data)
+        last_session["situation"] = message.text
+        last_session["current_step"] = "relapse_thoughts"
+        update_last_relapse_session(user_id, last_session)
         await ask_thoughts(message)
 
     elif current_step == "relapse_custom_thoughts":
-        current_session["thoughts"] = message.text
-        current_session["current_step"] = "relapse_emotions"
-        update_user_data(user_id, user_data)
+        last_session["thoughts"] = message.text
+        last_session["current_step"] = "relapse_emotions"
+        update_last_relapse_session(user_id, last_session)
         await ask_emotions(message)
 
     elif current_step == "relapse_custom_physical":
-        current_session["physical"] = message.text
-        current_session["current_step"] = "relapse_behavior"
-        update_user_data(user_id, user_data)
+        last_session["physical"] = message.text
+        last_session["current_step"] = "relapse_behavior"
+        update_last_relapse_session(user_id, last_session)
         await ask_behavior(message)
 
     elif current_step == "relapse_custom_behavior":
-        current_session["behavior"] = message.text
-        current_session["current_step"] = "relapse_done"
-        update_user_data(user_id, user_data)
+        last_session["behavior"] = message.text
+        last_session["current_step"] = "relapse_done"
+        update_last_relapse_session(user_id, last_session)
         await finish_relapse_quiz(message)
 
     else:
