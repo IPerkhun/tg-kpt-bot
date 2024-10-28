@@ -47,6 +47,7 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="/relapse_warning", description="Я сейчас сорвусь"),
         BotCommand(command="/help", description="Помощь"),
         BotCommand(command="/notes", description="Мои заметки"),
+        BotCommand(command="/feedback", description="Отправить отзыв"),
     ]
     await bot.set_my_commands(commands)
 
@@ -113,9 +114,13 @@ async def stop_smoking_handler(message: types.Message):
     lambda message: message.content_type == types.ContentType.TEXT
     and not message.text.startswith("/")
 )
-async def handle_message(message: types.Message):
+async def handle_message(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
 
+    current_state = await state.get_state()
+    if current_state == FeedbackState.waiting_for_feedback.state:
+        # Игнорируем обработку текстового сообщения, так как оно обработается в receive_feedback
+        return
     # Получаем последнюю сессию рецидива и квиз
     last_quiz = get_last_start_quiz(user_id)
     last_relapse = get_last_relapse_session(user_id)
@@ -138,20 +143,33 @@ async def handle_voice_message(message: types.Message):
 
 from db.feedback import add_feedback
 
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+
+# Определим состояние для фидбэка
+class FeedbackState(StatesGroup):
+    waiting_for_feedback = State()
+
 
 @dp.message(Command("feedback"))
-async def cmd_feedback(message: types.Message):
+async def start_feedback(message: types.Message, state: FSMContext):
+    # Устанавливаем состояние фидбэка
+    await state.set_state(FeedbackState.waiting_for_feedback)
+    await message.answer("Пожалуйста, напишите свой отзыв.")
+
+
+@dp.message(FeedbackState.waiting_for_feedback)
+async def receive_feedback(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
-    # Удаляем команду "/feedback" и любые лишние пробелы, чтобы оставить только текст отзыва
-    feedback_text = message.text.removeprefix("/feedback").strip()
+    feedback_text = message.text.strip()
 
     if feedback_text:
         add_feedback(user_id, feedback_text)
-        await message.answer("Спасибо за ваш фидбэк!")
+        await state.clear()
     else:
-        await message.answer(
-            "Пожалуйста, отправьте свой отзыв после команды /feedback."
-        )
+        await message.answer("Отзыв не может быть пустым.")
 
 
 dp.include_router(router)
