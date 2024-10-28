@@ -9,6 +9,7 @@ from aiogram.types import BotCommand
 from dotenv import load_dotenv
 
 from db.base import test_db_connection, create_tables
+from db.feedback import add_feedback
 
 from modules.base_handlers import handle_user_text, handle_user_voice
 from modules.note_manager import handle_notes_command
@@ -24,6 +25,8 @@ from modules.gpt_therapist import GPTTherapist
 from utils.content import help_text, welcome_text
 from utils.scheduler import start_scheduler
 
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 
 load_dotenv()
 
@@ -141,13 +144,6 @@ async def handle_voice_message(message: types.Message):
     await handle_user_voice(message, bot)
 
 
-from db.feedback import add_feedback
-
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-
 # Определим состояние для фидбэка
 class FeedbackState(StatesGroup):
     waiting_for_feedback = State()
@@ -167,9 +163,10 @@ async def receive_feedback(message: types.Message, state: FSMContext):
 
     if feedback_text:
         add_feedback(user_id, feedback_text)
+        await message.answer("Спасибо за ваш фидбэк!")
         await state.clear()
     else:
-        await message.answer("Отзыв не может быть пустым.")
+        await message.answer("Отзыв не может быть пустым. Попробуйте еще раз.")
 
 
 dp.include_router(router)

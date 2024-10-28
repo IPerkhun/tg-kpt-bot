@@ -2,10 +2,13 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 import logging
 
-load_dotenv()
+env_values = dotenv_values(".env")
+
+for key, value in env_values.items():
+    os.environ[key] = value
 
 DATABASE_URL = (
     f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@"
@@ -13,13 +16,16 @@ DATABASE_URL = (
 )
 logging.info(f"Connecting to the database at {DATABASE_URL}")
 
-engine = create_engine(DATABASE_URL, echo=False)
+engine = create_engine(DATABASE_URL, echo=False, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
 
 def create_tables():
+    logging.info("Creating tables in the database.")
+    print(f"Connecting to the database at {DATABASE_URL}")
+
     Base.metadata.create_all(bind=engine)
 
 
