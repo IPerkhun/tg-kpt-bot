@@ -27,11 +27,13 @@ from utils.scheduler import start_scheduler
 
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.storage.memory import MemoryStorage
+
 
 load_dotenv()
 
 logger = logging.basicConfig(level=logging.DEBUG)
-dp = Dispatcher()
+dp = Dispatcher(storage=MemoryStorage())
 router = Router()  # Создаем Router
 
 
@@ -113,6 +115,12 @@ async def stop_smoking_handler(message: types.Message):
     await cmd_stop_smoking(message, bot)
 
 
+# Обработчик для голосовых сообщений
+@dp.message(lambda message: message.content_type == types.ContentType.VOICE)
+async def handle_voice_message(message: types.Message):
+    await handle_user_voice(message, bot)
+
+
 @dp.message(
     lambda message: message.content_type == types.ContentType.TEXT
     and not message.text.startswith("/")
@@ -122,8 +130,9 @@ async def handle_message(message: types.Message, state: FSMContext):
 
     current_state = await state.get_state()
     if current_state == FeedbackState.waiting_for_feedback.state:
-        # Игнорируем обработку текстового сообщения, так как оно обработается в receive_feedback
+        await receive_feedback(message, state)
         return
+
     # Получаем последнюю сессию рецидива и квиз
     last_quiz = get_last_start_quiz(user_id)
     last_relapse = get_last_relapse_session(user_id)
@@ -136,12 +145,6 @@ async def handle_message(message: types.Message, state: FSMContext):
     else:
         # Если квиза и сессии рецидива нет, обрабатываем как обычное сообщение
         await handle_user_text(message)
-
-
-# Обработчик для голосовых сообщений
-@dp.message(lambda message: message.content_type == types.ContentType.VOICE)
-async def handle_voice_message(message: types.Message):
-    await handle_user_voice(message, bot)
 
 
 # Определим состояние для фидбэка
