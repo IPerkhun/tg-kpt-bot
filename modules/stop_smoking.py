@@ -3,6 +3,7 @@ from db.stop_smoking import get_stop_smoking_data, update_stop_smoking_data
 from datetime import datetime
 from aiogram import types, Bot
 import logging
+from utils.content import STOP_SMOKING_INFO
 
 logging.basicConfig(level=logging.INFO)
 
@@ -23,6 +24,4 @@ async def cmd_stop_smoking(message: types.Message, bot: Bot):
     }
     update_stop_smoking_data(user_id, stop_smoking_data)
 
-    await message.answer(
-        "Ты решил бросить курить! Я буду поддерживать тебя на этом пути и присылать сообщения с прогрессом."
-    )
+    await message.answer(STOP_SMOKING_INFO)

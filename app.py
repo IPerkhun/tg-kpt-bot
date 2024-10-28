@@ -40,7 +40,7 @@ logger = logging.basicConfig(level=logging.DEBUG)
 dp = Dispatcher(storage=MemoryStorage())
 register_feedback_handlers(dp)
 
-router = Router()  # Создаем Router
+router = Router()
 
 
 gpt_therapist = GPTTherapist(api_key=os.getenv("OPENAI_API_KEY"))
@@ -53,12 +53,11 @@ bot = Bot(
 async def set_bot_commands(bot: Bot):
     commands = [
         BotCommand(command="/start", description="Начать квиз"),
-        BotCommand(command="/start_quiz", description="Начать квиз"),
-        BotCommand(command="/stop_smoking", description="Бросить курить"),
         BotCommand(command="/relapse_warning", description="Я сейчас сорвусь"),
+        BotCommand(command="/feedback", description="Отправить отзыв"),
+        BotCommand(command="/stop_smoking", description="Получать полезную инфу"),
         BotCommand(command="/help", description="Помощь"),
         BotCommand(command="/notes", description="Мои заметки"),
-        BotCommand(command="/feedback", description="Отправить отзыв"),
     ]
     await bot.set_my_commands(commands)
 
