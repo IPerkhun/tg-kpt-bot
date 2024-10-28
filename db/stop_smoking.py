@@ -1,3 +1,6 @@
+# db/stop_smoking.py
+
+# Импортируем необходимые зависимости
 from sqlalchemy import Column, Integer, String, DateTime, Text
 from datetime import datetime, timezone
 from db.base import Base, SessionLocal
@@ -12,7 +15,6 @@ class StopSmoking(Base):
     jobs = Column(Text, nullable=True)
 
 
-# Получение данных отказа от курения для пользователя
 def get_stop_smoking_data(user_id: int):
     session = SessionLocal()
     try:
@@ -27,7 +29,6 @@ def get_stop_smoking_data(user_id: int):
         session.close()
 
 
-# Обновление данных отказа от курения для пользователя
 def update_stop_smoking_data(user_id: int, stop_smoking_data: dict):
     session = SessionLocal()
     try:
@@ -43,7 +44,6 @@ def update_stop_smoking_data(user_id: int, stop_smoking_data: dict):
             )
             stop_data.jobs = stop_smoking_data.get("jobs")
         else:
-            # Если данных нет, создаем новую запись
             stop_data = StopSmoking(
                 user_id=user_id,
                 stop_time=datetime.strptime(
@@ -52,6 +52,15 @@ def update_stop_smoking_data(user_id: int, stop_smoking_data: dict):
                 jobs=stop_smoking_data.get("jobs"),
             )
             session.add(stop_data)
+        session.commit()
+    finally:
+        session.close()
+
+
+def delete_stop_smoking_data(user_id: int):
+    session = SessionLocal()
+    try:
+        session.query(StopSmoking).filter(StopSmoking.user_id == user_id).delete()
         session.commit()
     finally:
         session.close()
