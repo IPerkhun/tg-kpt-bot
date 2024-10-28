@@ -24,8 +24,6 @@ Base = declarative_base()
 
 def create_tables():
     logging.info("Creating tables in the database.")
-    print(f"Connecting to the database at {DATABASE_URL}")
-
     Base.metadata.create_all(bind=engine)
 
 

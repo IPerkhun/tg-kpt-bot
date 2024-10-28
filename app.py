@@ -9,7 +9,6 @@ from aiogram.types import BotCommand
 from dotenv import load_dotenv
 
 from db.base import test_db_connection, create_tables
-from db.feedback import add_feedback
 
 from modules.base_handlers import handle_user_text, handle_user_voice
 from modules.note_manager import handle_notes_command
@@ -21,12 +20,17 @@ from modules.relapse_quiz import (
 from modules.start_quiz import start_quiz, handle_quiz_step, get_last_start_quiz
 from modules.stop_smoking import cmd_stop_smoking
 from modules.gpt_therapist import GPTTherapist
+from modules.feedback import (
+    FeedbackState,
+    handle_feedback_if_active,
+    register_feedback_handlers,
+)
+
 
 from utils.content import help_text, welcome_text
 from utils.scheduler import start_scheduler
 
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.storage.memory import MemoryStorage
 
 
@@ -34,6 +38,8 @@ load_dotenv()
 
 logger = logging.basicConfig(level=logging.DEBUG)
 dp = Dispatcher(storage=MemoryStorage())
+register_feedback_handlers(dp)
+
 router = Router()  # Создаем Router
 
 
@@ -128,11 +134,8 @@ async def handle_voice_message(message: types.Message):
 async def handle_message(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
 
-    current_state = await state.get_state()
-    if current_state == FeedbackState.waiting_for_feedback.state:
-        await receive_feedback(message, state)
+    if await handle_feedback_if_active(message, state):
         return
-
     # Получаем последнюю сессию рецидива и квиз
     last_quiz = get_last_start_quiz(user_id)
     last_relapse = get_last_relapse_session(user_id)
@@ -147,29 +150,10 @@ async def handle_message(message: types.Message, state: FSMContext):
         await handle_user_text(message)
 
 
-# Определим состояние для фидбэка
-class FeedbackState(StatesGroup):
-    waiting_for_feedback = State()
-
-
 @dp.message(Command("feedback"))
 async def start_feedback(message: types.Message, state: FSMContext):
-    # Устанавливаем состояние фидбэка
     await state.set_state(FeedbackState.waiting_for_feedback)
     await message.answer("Пожалуйста, напишите свой отзыв.")
-
-
-@dp.message(FeedbackState.waiting_for_feedback)
-async def receive_feedback(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-    feedback_text = message.text.strip()
-
-    if feedback_text:
-        add_feedback(user_id, feedback_text)
-        await message.answer("Спасибо за ваш фидбэк!")
-        await state.clear()
-    else:
-        await message.answer("Отзыв не может быть пустым. Попробуйте еще раз.")
 
 
 dp.include_router(router)
