@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher, types, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from aiogram.types import BotCommand
+from aiogram.types import BotCommand, CallbackQuery
 from dotenv import load_dotenv
 
 from db.base import test_db_connection, create_tables
@@ -18,7 +18,7 @@ from modules.relapse_quiz import (
     get_last_relapse_session,
 )
 from modules.start_quiz import start_quiz, handle_quiz_step, get_last_start_quiz
-from modules.stop_smoking import cmd_stop_smoking
+from modules.stop_smoking import cmd_stop_smoking, cancel_stop_smoking
 from modules.gpt_therapist import GPTTherapist
 from modules.feedback import (
     FeedbackState,
@@ -118,6 +118,11 @@ async def cmd_relapse_warning(message: types.Message):
 @dp.message(Command("stop_smoking"))
 async def stop_smoking_handler(message: types.Message):
     await cmd_stop_smoking(message, bot)
+
+
+@dp.callback_query(lambda callback_query: callback_query.data == "cancel_stop_smoking")
+async def handle_cancel_stop_smoking_callback(callback_query: CallbackQuery):
+    await cancel_stop_smoking(callback_query)
 
 
 # Обработчик для голосовых сообщений

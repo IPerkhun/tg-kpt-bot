@@ -1,10 +1,10 @@
-from modules.auto_messaging import schedule_messages, cancel_scheduled_messages
+from modules.auto_messaging import schedule_messages
 from db.stop_smoking import (
     get_stop_smoking_data,
     update_stop_smoking_data,
     delete_stop_smoking_data,
 )
-from datetime import datetime, timedelta
+from datetime import datetime
 from aiogram import types, Bot
 import logging
 from utils.content import (
@@ -14,6 +14,21 @@ from utils.content import (
 )
 
 logging.basicConfig(level=logging.INFO)
+from aiogram.types import CallbackQuery
+
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+inline_keyboard = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="Отменить отправку сообщений",
+                callback_data="cancel_stop_smoking",
+            )
+        ]
+    ]
+)
 
 
 async def cmd_stop_smoking(message: types.Message, bot: Bot):
@@ -21,11 +36,13 @@ async def cmd_stop_smoking(message: types.Message, bot: Bot):
     stop_smoking_data = get_stop_smoking_data(user_id)
 
     if stop_smoking_data:
-        # Если пользователь уже зарегистрировал отказ, просто уведомим его
+        execute_time = datetime.now() - stop_smoking_data.stop_time
         await message.answer(
             STOP_SMOKING_ALREADY_STARTED.format(
-                time=stop_smoking_data.stop_time.strftime("%Y-%m-%d %H:%M:%S")
-            )
+                time=stop_smoking_data.stop_time.strftime("%Y-%m-%d %H:%M"),
+                execute_time=execute_time,
+            ),
+            reply_markup=inline_keyboard,
         )
         return
 
@@ -37,26 +54,29 @@ async def cmd_stop_smoking(message: types.Message, bot: Bot):
     }
     update_stop_smoking_data(user_id, stop_smoking_data)
 
-    await message.answer(STOP_SMOKING_INFO)
+    await message.answer(STOP_SMOKING_INFO, reply_markup=inline_keyboard)
 
 
-async def cancel_stop_smoking(message: types.Message):
-    user_id = message.from_user.id
+async def cancel_stop_smoking(callback_query: CallbackQuery):
+    user_id = callback_query.from_user.id
     stop_smoking_data = get_stop_smoking_data(user_id)
 
     if stop_smoking_data:
-        # Отменяем запланированные сообщения
-        cancel_scheduled_messages(stop_smoking_data["jobs"])
-        delete_stop_smoking_data(user_id)  # Удаляем данные отказа
+        delete_stop_smoking_data(user_id)
 
-        # Вычисляем время без сигарет
         stop_time = stop_smoking_data.stop_time
         time_without_smoking = datetime.now() - stop_time
-        hours, remainder = divmod(time_without_smoking.total_seconds(), 3600)
+        days, remainder = divmod(time_without_smoking.total_seconds(), 86400)
+        hours, remainder = divmod(remainder, 3600)
         minutes, seconds = divmod(remainder, 60)
 
-        await message.answer(
-            STOP_SMOKING_CANCELLED.format(hours=int(hours), minutes=int(minutes))
+        await callback_query.message.answer(
+            STOP_SMOKING_CANCELLED.format(
+                days=int(days), hours=int(hours), minutes=int(minutes)
+            )
         )
+        await callback_query.answer()
     else:
-        await message.answer("Вы еще не регистрировали отказ от курения.")
+        await callback_query.message.answer(
+            "Вы еще не регистрировали отказ от курения."
+        )
