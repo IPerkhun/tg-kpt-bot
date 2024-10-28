@@ -136,6 +136,24 @@ async def handle_voice_message(message: types.Message):
     await handle_user_voice(message, bot)
 
 
+from db.feedback import add_feedback
+
+
+@dp.message(Command("feedback"))
+async def cmd_feedback(message: types.Message):
+    user_id = message.from_user.id
+    # Удаляем команду "/feedback" и любые лишние пробелы, чтобы оставить только текст отзыва
+    feedback_text = message.text.removeprefix("/feedback").strip()
+
+    if feedback_text:
+        add_feedback(user_id, feedback_text)
+        await message.answer("Спасибо за ваш фидбэк!")
+    else:
+        await message.answer(
+            "Пожалуйста, отправьте свой отзыв после команды /feedback."
+        )
+
+
 dp.include_router(router)
 
 
